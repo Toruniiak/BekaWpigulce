@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Beka w Pigułce - Strona Główna</title>
+    <style>
+        body { font-family: 'Segoe UI', Arial, sans-serif; background: #f0f2f5; margin: 0; padding: 0; text-align: center; color: #1c1e21; }
+        header { background: #000; color: white; padding: 25px 10px; }
+        header h1 { margin: 0; font-size: 28px; }
+        nav { margin-top: 15px; }
+        /* Kluczowa zmiana: linki kierują do lokalnych plików .html */
+        nav a { color: white; margin: 0 12px; text-decoration: none; font-weight: bold; font-size: 15px; }
+        nav a:hover { color: #1877f2; }
+        .hero { padding: 40px 20px; background: #fff; border-bottom: 1px solid #ddd; }
+        .content-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; padding: 20px; max-width: 1000px; margin: 0 auto; }
+        .card { background: white; padding: 25px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.08); transition: 0.3s; }
+        .card:hover { transform: translateY(-5px); }
+        .ad-box { background: #e4e6eb; padding: 30px; margin: 20px auto; max-width: 800px; border-radius: 8px; border: 1px dashed #bcc0c4; }
+        .cta-button { display: inline-block; background: #1877f2; color: white; padding: 12px 25px; text-decoration: none; border-radius: 8px; margin-top: 15px; font-weight: bold; }
+        footer { background: #000; color: #b0b3b8; padding: 30px; margin-top: 50px; font-size: 14px; }
+        footer a { color: #b0b3b8; text-decoration: underline; }
+    </style>
+</head>
+<body>
+
+<header>
+    <h1>Beka w Pigułce 😂</h1>
+    <nav>
+        <a href="index.html">Home</a>
+        <a href="zagadki.html">Zagadki</a>
+        <a href="odpowiedzi.html">Odpowiedzi</a>
+        <a href="memy.html">Memy</a>
+    </nav>
+</header>
+
+<div class="hero">
+    <h2>Witaj w świecie beki! 🚀</h2>
+    <p>Codzienna dawka najlepszych zagadek, memów i testów na spostrzegawczość.</p>
+</div>
+
+<div class="ad-box">
+    <p style="font-size: 11px; color: #65676b; margin-top: 0;">REKLAMA GOOGLE</p>
+    <strong>MIEJSCE NA TWOJĄ REKLAMĘ ADSENSE</strong>
+</div>
+
+<main class="content-grid">
+    <div class="card">
+        <h3>Najnowsze Zagadki</h3>
+        <p>Sprawdź, czy masz sokoli wzrok i rozwiąż nasze zagadki!</p>
+        <a href="zagadki.html" class="cta-button">ZOBACZ ZAGADKI</a>
+    </div>
+
+    <div class="card">
+        <h3>Memy i Humor</h3>
+        <p>Najśmieszniejsze obrazki z sieci w jednym miejscu.</p>
+        <a href="memy.html" class="cta-button" style="background: #333;">LEĆ DO MEMÓW</a>
+    </div>
+
+    <div class="card">
+        <h3>Odpowiedzi</h3>
+        <p>Nie dajesz rady? Sprawdź rozwiązania zagadek.</p>
+        <a href="odpowiedzi.html" class="cta-button" style="background: #42b72a;">SPRAWDŹ</a>
+    </div>
+</main>
+
+<footer>
+    <p>&copy; 2024 Beka w Pigułce | <a href="prywatnosc.html">Polityka Prywatności</a></p>
+    <p style="font-size: 11px; margin-top: 10px;">Strona hobbystyczna dla fanów dobrego humoru.</p>
+</footer>
+
+</body>
+</html>
