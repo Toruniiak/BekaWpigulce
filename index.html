@@ -6,29 +6,42 @@
     <title>Beka w Pigułce - Strona Główna</title>
     <link rel="stylesheet" href="style.css">
     <style>
-        body { font-family: Arial, sans-serif; background: #f8f8f8; margin: 0; padding: 0; text-align: center; }
+        body { font-family: 'Arial', sans-serif; background: #f0f2f5; margin: 0; padding: 0; text-align: center; color: #1c1e21; }
         
-        /* Styl banera i menu */
-        header { background: none; padding: 0; }
+        /* Sekcja nagłówka i banera */
+        header { background: #fff; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        .banner-container { width: 100%; overflow: hidden; line-height: 0; }
         .banner-img { width: 100%; height: auto; display: block; }
-        nav { background: #111; padding: 15px 0; sticky: top; }
-        nav a { color: white; margin: 0 15px; text-decoration: none; font-weight: bold; font-size: 16px; }
         
-        .hero { padding: 30px 20px; }
-        .content-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; padding: 20px; max-width: 1100px; margin: 0 auto; }
-        .card { background: white; padding: 25px; border-radius: 12px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); }
-        .ad-box { background: #eee; padding: 25px; margin: 20px auto; max-width: 90%; border-radius: 8px; border: 1px dashed #bbb; }
+        /* Nawigacja */
+        nav { background: #111; padding: 12px 0; position: sticky; top: 0; z-index: 1000; }
+        nav a { color: white; margin: 0 12px; text-decoration: none; font-weight: bold; font-size: 15px; text-transform: uppercase; }
+        nav a:hover { color: #1877f2; }
+
+        /* Treść strony */
+        .hero { padding: 40px 20px; background: white; margin-bottom: 20px; }
+        .hero h2 { margin: 0; font-size: 28px; color: #1877f2; }
+        .hero p { font-size: 18px; color: #606770; }
+
+        .content-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; padding: 20px; max-width: 1200px; margin: 0 auto; }
+        .card { background: white; padding: 30px; border-radius: 15px; box-shadow: 0 4px 12px rgba(0,0,0,0.08); transition: transform 0.2s; }
+        .card:hover { transform: translateY(-5px); }
+        .card h3 { margin-top: 0; font-size: 22px; }
         
-        .cta-button { display: inline-block; background: #1877f2; color: white; padding: 12px 25px; text-decoration: none; border-radius: 8px; margin-top: 15px; font-weight: bold; }
-        footer { background: #111; color: white; padding: 30px; margin-top: 50px; }
-        footer a { color: #aaa; text-decoration: none; }
+        /* Przyciski i reklamy */
+        .cta-button { display: inline-block; background: #1877f2; color: white; padding: 12px 25px; text-decoration: none; border-radius: 8px; margin-top: 15px; font-weight: bold; font-size: 16px; }
+        .ad-placeholder { background: #e4e6eb; padding: 20px; margin: 20px auto; max-width: 90%; border-radius: 10px; color: #65676b; font-weight: bold; border: 2px dashed #bcc0c4; }
+
+        footer { background: #111; color: #8a8d91; padding: 40px 20px; margin-top: 40px; font-size: 14px; }
+        footer a { color: #8a8d91; text-decoration: underline; }
     </style>
 </head>
 <body>
 
 <header>
-    <img src="Zrzut ekranu_2026-04-16-00-39-32-807_com.facebook.katana.jpg" alt="Beka w Pigułce Baner" class="banner-img">
-    
+    <div class="banner-container">
+        <img src="Baner.jpg" alt="Beka w Pigułce" class="banner-img">
+    </div>
     <nav>
         <a href="index.html">Home</a>
         <a href="zagadki.html">Zagadki</a>
@@ -39,38 +52,22 @@
 
 <div class="hero">
     <h2>Witaj w świecie beki! 🚀</h2>
-    <p>Najlepsze zagadki i memy w jednym miejscu. Sprawdź, czy dasz radę rozwiązać dzisiejsze wyzwania!</p>
+    <p>Codzienna dawka śmiechu, zagadek i testów na spostrzegawczość.</p>
 </div>
 
-<div class="ad-box">
-    <p style="font-size: 11px; color: #666; margin-bottom: 5px;">REKLAMA GOOGLE</p>
-    <strong>MIEJSCE NA TWOJĄ REKLAMĘ ADSENSE</strong>
+<div class="ad-placeholder">
+    <span style="font-size: 10px; display: block; margin-bottom: 5px;">REKLAMA GOOGLE ADSENSE</span>
+    MIEJSCE NA TWOJĄ REKLAMĘ
 </div>
 
 <main class="content-grid">
     <div class="card">
-        <h3>🧩 Zagadki</h3>
-        <p>Sprawdź swoją spostrzegawczość i sokoli wzrok.</p>
-        <a href="zagadki.html" class="cta-button">ZOBACZ ZAGADKI</a>
+        <h3>🧩 Zagadki dnia</h3>
+        <p>Masz sokoli wzrok? Sprawdź nasze najnowsze zagadki i znajdź błędy na obrazkach!</p>
+        <a href="zagadki.html" class="cta-button">ROZWIĄŻ ZAGADKI</a>
     </div>
 
     <div class="card">
-        <h3>😂 Memy</h3>
-        <p>Codzienna dawka humoru z Twoich ulubionych postów.</p>
-        <a href="memy.html" class="cta-button" style="background: #333;">LEĆ DO MEMÓW</a>
-    </div>
-
-    <div class="card">
-        <h3>🎯 Quiz dnia</h3>
-        <p>Rozwiąż szybki test i pochwal się wynikiem na FB!</p>
-        <a href="#" class="cta-button" style="background: #e4e6eb; color: #4b4f56;">WKRÓTCE</a>
-    </div>
-</main>
-
-<footer>
-    <p>&copy; 2026 Beka w Pigułce</p>
-    <p><a href="prywatnosc.html">Polityka Prywatności</a></p>
-</footer>
-
-</body>
-</html>
+        <h3>😂 Najlepsze Memy</h3>
+        <p>Wyselekcjonowane wrzutki, które rozbawią Cię do łez. Tylko świeży towar!</p>
+        <a href="memy.html" class="cta-button" style="background:
