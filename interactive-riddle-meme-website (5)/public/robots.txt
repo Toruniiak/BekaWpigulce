@@ -1,0 +1,14 @@
+# robots.txt for Beka w Pigułce
+User-agent: *
+Allow: /
+
+# Sitemap
+Sitemap: https://bekawpigulce.pl/sitemap.xml
+
+# Disallow admin and private pages
+Disallow: /admin/
+Disallow: /private/
+
+# Google AdSense
+User-agent: Mediapartners-Google
+Allow: /
