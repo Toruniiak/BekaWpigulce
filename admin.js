@@ -141,6 +141,10 @@
         <div class="grid grid-3" style="margin-bottom:8px">
           ${tiles.map(t => `<div class="stat-tile ${t[2]}"><b>${s[t[0]]}</b><span>${t[1]}</span></div>`).join('')}
         </div>
+        <div class="grid grid-3" style="margin-bottom:8px">
+          <div class="stat-tile green"><b id="visitTotal">…</b><span>Wejścia na stronę (łącznie)</span></div>
+          <div class="stat-tile"><b id="visitUnique">…</b><span>Unikalni odwiedzający</span></div>
+        </div>
         <div class="adm-card">
           <div class="adm-section-title">🔥 Top 5 memów (wg głosów)</div>
           <div class="bars">${bars}</div>
@@ -149,6 +153,18 @@
           <div class="adm-section-title">Podsumowanie głosów</div>
           <p class="muted">Na plus: <b style="color:var(--yellow)">${s.votes_up}</b> · na minus: <b style="color:var(--red)">${s.votes_down}</b> · łącznie memów w bazie: <b>${s.memes_total}</b>.</p>
         </div>`;
+
+      /* Dociągnij liczniki odwiedzin z Abacus (te same klucze, co w shell.js).
+         /get nie podbija licznika — tylko odczytuje. 404 = nikt jeszcze nie wszedł. */
+      (function loadVisitStats() {
+        const API = 'https://abacus.jasoncameron.dev', NS = 'bekawpigulce.pl';
+        [['wejscia', 'visitTotal'], ['unikalni', 'visitUnique']].forEach(([key, id]) => {
+          fetch(API + '/get/' + NS + '/' + key)
+            .then(r => r.ok ? r.json() : { value: 0 })
+            .then(j => { const n = el(id); if (n) n.textContent = Number(j.value || 0).toLocaleString('pl-PL'); })
+            .catch(() => { const n = el(id); if (n) n.textContent = '—'; });
+        });
+      })();
     },
 
     /* ---------- POCZEKALNIA: moderacja zgłoszonych memów ---------------- */

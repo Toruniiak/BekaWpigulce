@@ -216,6 +216,27 @@ const UI = (() => {
 
     renderAds();
     maybeInjectAdsense();
+    trackVisit();
+  }
+
+  /* Liczniki odwiedzin (Abacus — darmowe API, bez klucza, bez rejestracji).
+     'wejscia'  — bije przy KAŻDYM wyświetleniu strony (ogólny licznik),
+     'unikalni' — bije tylko przy pierwszej wizycie z danego urządzenia
+                  (flaga w localStorage; strona statyczna nie widzi IP).
+     Panel admina nie jest liczony, żeby nie zawyżać własnych statystyk. */
+  function trackVisit() {
+    if (document.body.dataset.page === 'admin') return;
+    if (location.protocol === 'file:' || location.hostname === 'localhost') return;
+    const API = 'https://abacus.jasoncameron.dev';
+    const NS = 'bekawpigulce.pl';
+    fetch(API + '/hit/' + NS + '/wejscia').catch(() => {});
+    try {
+      if (!localStorage.getItem('bkw_uv')) {
+        fetch(API + '/hit/' + NS + '/unikalni')
+          .then(r => { if (r.ok) localStorage.setItem('bkw_uv', '1'); })
+          .catch(() => {});
+      }
+    } catch (e) { /* localStorage zablokowany — pomijamy licznik unikalnych */ }
   }
 
   /* Po wpisaniu ca-pub w panelu — wstrzykuje skrypt AdSense na każdej stronie
