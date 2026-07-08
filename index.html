@@ -42,12 +42,16 @@
       <a class="sec-link" id="fbLink" target="_blank" rel="noopener">Otwórz profil →</a>
     </div>
     <div class="split">
-      <div class="card card--pad0" style="padding:18px;display:flex;justify-content:center">
-        <!-- Oficjalna wtyczka FB: pokazuje najnowsze posty po podaniu adresu strony w panelu -->
-        <div class="fb-page"
-             data-tabs="timeline" data-width="500" data-height="560"
-             data-small-header="true" data-hide-cover="false"
-             data-show-facepile="false" id="fbPlugin">
+      <div class="card card--pad0" style="padding:12px;display:flex;justify-content:center;min-width:0;overflow:hidden">
+        <!-- Oficjalna wtyczka FB: data-adapt-container-width sprawia, że plugin
+             zwęża się do szerokości kontenera (naprawia rozjeżdżanie na telefonie) -->
+        <div style="width:100%;max-width:500px;min-width:0">
+          <div class="fb-page"
+               data-tabs="timeline" data-width="500" data-height="480"
+               data-adapt-container-width="true"
+               data-small-header="true" data-hide-cover="true"
+               data-show-facepile="false" id="fbPlugin">
+          </div>
         </div>
       </div>
       <div class="card">

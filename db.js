@@ -68,6 +68,8 @@ const DB = (() => {
       { id: 'game_snake', code: 'snake', name: 'Wężyk', description: 'Klasyczny wąż. Zbieraj, rośnij i bij własny rekord.', category: 'zręcznościowe', enabled: true },
       { id: 'game_runner', code: 'runner', name: 'Motorek', description: 'Skacz nad przeszkodami i jedź jak najdalej. Liczy się dystans.', category: 'zręcznościowe', enabled: true },
       { id: 'game_saper', code: 'saper', name: 'Saper', description: 'Odkrywaj pola bez min. Klasyk logiczny z licznikiem czasu.', category: 'logiczne', enabled: true },
+      { id: 'game_bloki', code: 'bloki', name: 'Bloki 10×10', description: 'Układaj klocki na planszy 10×10 i czyść linie. Serie dają bonusy — jak długo przetrwasz?', category: 'logiczne', enabled: true },
+      { id: 'game_2048', code: 'g2048', name: '2048', description: 'Przesuwaj i łącz kafelki, aż zbudujesz 2048. Prosta zasada, trudny mistrz.', category: 'logiczne', enabled: true },
       { id: 'game_ubieranka', code: 'ubieranka', name: 'Ubierz Beka-ludka', description: 'Stwórz własną postać — czapki, okulary, miny, tła.', category: 'kreatywne', enabled: true }
     ];
 
@@ -107,6 +109,30 @@ const DB = (() => {
         { q: 'Ile liter ma polski alfabet?', opts: ['26', '30', '32', '35'], answer: 2 },
         { q: 'W którym roku miał miejsce chrzest Polski?', opts: ['966', '1000', '1025', '1410'], answer: 0 },
         { q: 'Polska waluta to:', opts: ['Korona', 'Złoty', 'Forint', 'Euro'], answer: 1 }
+      ]},
+      { id: 'quiz_emoji', title: 'Zgadnij po emoji', desc: 'Trzy emotki = jedno hasło. Proste? Zobaczymy przy pytaniu 7.', questions: [
+        { q: '🌧️ + ☂️ + 🚌 — co to za sytuacja?', opts: ['Wakacje', 'Poniedziałek rano', 'Grill u wujka', 'Sylwester'], answer: 1 },
+        { q: '🍕 + 🎮 + 🌙 — czyli klasyczny…', opts: ['Poranek sportowca', 'Wieczór singla', 'Obiad u babci', 'Trening'], answer: 1 },
+        { q: '👨‍💼 + 📞 + 😱 — kto dzwoni?', opts: ['Kurier', 'Mama', 'Szef', 'Telemarketer'], answer: 2 },
+        { q: '🧦 + 🕳️ + 🚶 — co się stało?', opts: ['Dziura w skarpecie', 'Zgubiony but', 'Nowe adidasy', 'Pranie się skurczyło'], answer: 0 },
+        { q: '🛒 + 💸 + 😭 — gdzie jesteś?', opts: ['Na siłowni', 'W Biedronce przed wypłatą', 'Na wakacjach', 'U dentysty'], answer: 1 },
+        { q: '🐔 + 🥣 + 👵 — niedzielny klasyk to…', opts: ['Pizza', 'Sushi', 'Rosół u babci', 'Kebab'], answer: 2 },
+        { q: '🚗 + 🐌 + 😤 — co to?', opts: ['Wyścig', 'Korek do pracy', 'Jazda próbna', 'Autostrada nocą'], answer: 1 },
+        { q: '📱 + 🔋 + 1️⃣ — jaki to stan?', opts: ['Nowy telefon', '1% baterii i panika', 'Tryb samolotowy', 'Pełne ładowanie'], answer: 1 },
+        { q: '🛏️ + ⏰ + 🔁 — co robisz?', opts: ['Wstajesz od razu', 'Drzemka co 5 minut', 'Ścielisz łóżko', 'Biegasz rano'], answer: 1 },
+        { q: '🍟 + 🤫 + 🚗 — czyli…', opts: ['Dieta', 'Frytki zjedzone w aucie, zanim dojedziesz do domu', 'Piknik', 'Wesele'], answer: 1 }
+      ]},
+      { id: 'quiz_pf', title: 'Prawda czy fałsz?', desc: 'Ciekawostki, w które trudno uwierzyć. Połowa ludzi strzela źle.', questions: [
+        { q: 'Miód praktycznie nigdy się nie psuje.', opts: ['Prawda', 'Fałsz'], answer: 0 },
+        { q: 'Banany rosną na drzewach.', opts: ['Prawda', 'Fałsz — bananowiec to zioło'], answer: 1 },
+        { q: 'Ośmiornica ma trzy serca.', opts: ['Prawda', 'Fałsz'], answer: 0 },
+        { q: 'Wielki Mur Chiński widać gołym okiem z kosmosu.', opts: ['Prawda', 'Fałsz'], answer: 1 },
+        { q: 'Błyskawica jest gorętsza niż powierzchnia Słońca.', opts: ['Prawda', 'Fałsz'], answer: 0 },
+        { q: 'Człowiek połyka we śnie średnio 8 pająków rocznie.', opts: ['Prawda', 'Fałsz — to miejska legenda'], answer: 1 },
+        { q: 'Krowy mają najlepsze przyjaciółki i stresują się rozłąką.', opts: ['Prawda', 'Fałsz'], answer: 0 },
+        { q: 'Złota rybka pamięta tylko 3 sekundy.', opts: ['Prawda', 'Fałsz — pamięta miesiącami'], answer: 1 },
+        { q: 'W Szkocji narodowym zwierzęciem jest jednorożec.', opts: ['Prawda', 'Fałsz'], answer: 0 },
+        { q: 'Wenus ma dobę dłuższą niż rok.', opts: ['Prawda', 'Fałsz'], answer: 0 }
       ]}
     ];
 
@@ -157,6 +183,7 @@ const DB = (() => {
       polls,
       ads,
       answers: [],
+      reports: [],
       reactions: { fire: 0, wow: 0, heart: 0, poop: 0 }
     };
   }
@@ -166,7 +193,7 @@ const DB = (() => {
     const s = seed();
     const out = Object.assign({}, s, d);
     out.settings = Object.assign({}, s.settings, d.settings || {});
-    ['categories','memes','videos','comments','users','games','quizzes','challenges','polls','ads','answers'].forEach(k => {
+    ['categories','memes','videos','comments','users','games','quizzes','challenges','polls','ads','answers','reports'].forEach(k => {
       if (!Array.isArray(out[k])) out[k] = s[k];
     });
     out.reactions = Object.assign({}, s.reactions, d.reactions || {});
@@ -338,6 +365,50 @@ const DB = (() => {
     logout() { localStorage.removeItem(USER_KEY); }
   };
 
+  /* ---- ULUBIONE (per przeglądarka, jak głosy) --------------------------- */
+  const FAV_KEY = 'bwp_favs';
+  const favorites = {
+    _all() { try { return JSON.parse(localStorage.getItem(FAV_KEY)) || {}; } catch (e) { return {}; } },
+    has: (id) => !!favorites._all()[id],
+    toggle(id) {
+      const f = favorites._all();
+      if (f[id]) delete f[id]; else f[id] = 1;
+      try { localStorage.setItem(FAV_KEY, JSON.stringify(f)); } catch (e) {}
+      return !!f[id];
+    },
+    list: () => Object.keys(favorites._all()).map(id => memes.byId(id)).filter(Boolean),
+    count: () => Object.keys(favorites._all()).length
+  };
+
+  /* ---- ZGŁOSZENIA nieodpowiednich treści -------------------------------- */
+  const REP_KEY = 'bwp_reported';
+  const reports = {
+    all: () => state.reports.slice(),
+    forMeme: (id) => state.reports.filter(r => r.meme_id === id),
+    count: () => state.reports.length,
+    alreadyByMe(id) { try { return !!(JSON.parse(localStorage.getItem(REP_KEY)) || {})[id]; } catch (e) { return false; } },
+    add(meme_id, reason = 'inne') {
+      if (reports.alreadyByMe(meme_id)) return { ok: false, reason: 'already' };
+      state.reports.push({ id: uid('rep'), meme_id, reason, created_at: now() }); save();
+      try {
+        const mine = JSON.parse(localStorage.getItem(REP_KEY) || '{}'); mine[meme_id] = 1;
+        localStorage.setItem(REP_KEY, JSON.stringify(mine));
+      } catch (e) {}
+      return { ok: true };
+    },
+    clear(meme_id) { state.reports = state.reports.filter(r => r.meme_id !== meme_id); save(); }
+  };
+
+  /* ---- REPUTACJA autora: suma wyniku zatwierdzonych memów + bonusy ------ */
+  function reputation(author) {
+    if (!author) return { points: 0, memes: 0, level: 'Świeżak' };
+    const mine = memes.approved().filter(m => (m.author || '').toLowerCase() === author.toLowerCase());
+    const pts = mine.reduce((s, m) => s + Math.max(0, memes.score(m)) * 2 + 5, 0)
+      + state.comments.filter(c => (c.author || '').toLowerCase() === author.toLowerCase()).length;
+    const level = pts >= 500 ? 'Legenda beki 👑' : pts >= 200 ? 'Mistrz memów 🔥' : pts >= 60 ? 'Beka-wyjadacz 😎' : pts > 0 ? 'Rozkręcasz się 🙂' : 'Świeżak';
+    return { points: pts, memes: mine.length, level };
+  }
+
   function stats() {
     const up = state.memes.reduce((s, m) => s + (m.votes_up || 0), 0);
     const down = state.memes.reduce((s, m) => s + (m.votes_down || 0), 0);
@@ -373,6 +444,7 @@ const DB = (() => {
   return {
     settings, categories, memes, comments, videos, games, quizzes,
     challenges, polls, answers, ads, reactions, users, stats, raw,
+    favorites, reports, reputation,
     util: { uid, now, esc, slugify, placeholder, extractYouTube }
   };
 })();

@@ -25,8 +25,8 @@
     return s.best ? `Twój rekord: ${s.best}` : 'Zagraj!';
   }
 
-  const GAME_ICONS = { lap: '🎯', memory: '🃏', reflex: '⚡', snake: '🐍', runner: '🏍️', saper: '💣', ubieranka: '🎽' };
-  const LAUNCHERS = { lap: launchCatch, memory: launchMemory, reflex: launchReflex, snake: launchSnake, runner: launchRunner, saper: launchSaper, ubieranka: launchUbieranka };
+  const GAME_ICONS = { lap: '🎯', memory: '🃏', reflex: '⚡', snake: '🐍', runner: '🏍️', saper: '💣', ubieranka: '🎽', bloki: '🧱', g2048: '🔢' };
+  const LAUNCHERS = { lap: launchCatch, memory: launchMemory, reflex: launchReflex, snake: launchSnake, runner: launchRunner, saper: launchSaper, ubieranka: launchUbieranka, bloki: launchBloki, g2048: launch2048 };
 
   /* --- kafelki gier --- */
   const grid = $('#gamesGrid');
@@ -400,6 +400,225 @@
       catch (err) { UI.toast('Nie udało się pobrać', 'err'); }
     };
     draw();
+  }
+
+  /* ===================== BLOKI 10×10 =================================== */
+  /* Rozbudowana układanka typu 1010!: plansza 10×10, trzy klocki w tacce,
+     czyszczenie pełnych wierszy i kolumn, mnożnik za serie (combo),
+     wykrywanie końca gry, rekord w localStorage. Sterowanie mobilne:
+     tapnij klocek w tacce, potem tapnij pole planszy (kotwica = lewy górny
+     róg klocka). Podgląd ustawienia pokazuje się po najechaniu/tapnięciu. */
+  function launchBloki() {
+    Stats.play('bloki');
+    const N = 10;
+    const SHAPES = [
+      { c: [[0,0]], col: '#FFD400' },
+      { c: [[0,0],[0,1]], col: '#34D399' }, { c: [[0,0],[1,0]], col: '#34D399' },
+      { c: [[0,0],[0,1],[0,2]], col: '#60A5FA' }, { c: [[0,0],[1,0],[2,0]], col: '#60A5FA' },
+      { c: [[0,0],[0,1],[0,2],[0,3]], col: '#F472B6' }, { c: [[0,0],[1,0],[2,0],[3,0]], col: '#F472B6' },
+      { c: [[0,0],[0,1],[0,2],[0,3],[0,4]], col: '#FF3B30' }, { c: [[0,0],[1,0],[2,0],[3,0],[4,0]], col: '#FF3B30' },
+      { c: [[0,0],[0,1],[1,0],[1,1]], col: '#FBBF24' },
+      { c: [[0,0],[0,1],[0,2],[1,0],[1,1],[1,2],[2,0],[2,1],[2,2]], col: '#A78BFA' },
+      { c: [[0,0],[1,0],[1,1]], col: '#4ADE80' }, { c: [[0,0],[0,1],[1,1]], col: '#4ADE80' },
+      { c: [[0,1],[1,0],[1,1]], col: '#4ADE80' }, { c: [[0,0],[0,1],[1,0]], col: '#4ADE80' },
+      { c: [[0,0],[1,0],[2,0],[2,1],[2,2]], col: '#FB923C' }, { c: [[0,0],[0,1],[0,2],[1,2],[2,2]], col: '#FB923C' }
+    ];
+    let board, tray, score, streak, sel, over;
+
+    const body = UI.modal(`
+      <div class="gamewrap">
+        <div class="gamehud"><div>Punkty: <b id="bkScore">0</b></div><div>Rekord: <b id="bkBest">${Stats.get('bloki').best || 0}</b></div><div>Seria: <b id="bkStreak">×1</b></div></div>
+        <div id="bkBoard" style="display:grid;grid-template-columns:repeat(${N},1fr);gap:3px;background:#151515;border:1px solid #2e2e2e;border-radius:12px;padding:8px;touch-action:manipulation"></div>
+        <p class="muted micro" style="margin:8px 0 4px;text-align:center">Wybierz klocek, potem tapnij pole (lewy górny róg klocka).</p>
+        <div id="bkTray" style="display:flex;gap:10px;justify-content:center;align-items:flex-end;min-height:96px;padding:6px 0"></div>
+        <button class="btn btn--block" id="bkAgain" style="display:none">Zagraj ponownie</button>
+      </div>`, { title: '🧱 Bloki 10×10' });
+
+    const boardEl = body.querySelector('#bkBoard'), trayEl = body.querySelector('#bkTray');
+    const cells = [];
+    for (let i = 0; i < N * N; i++) {
+      const d = document.createElement('div');
+      d.style.cssText = 'aspect-ratio:1;border-radius:5px;background:#232323;transition:background .12s';
+      d.dataset.i = i;
+      d.onclick = () => tryPlace(i);
+      d.onmouseenter = () => preview(i, true);
+      d.onmouseleave = () => preview(i, false);
+      boardEl.appendChild(d); cells.push(d);
+    }
+
+    function reset() {
+      board = Array(N * N).fill(null); tray = []; score = 0; streak = 0; sel = -1; over = false;
+      body.querySelector('#bkAgain').style.display = 'none';
+      refill(); paint(); drawTray(); hud();
+    }
+    function refill() { while (tray.length < 3) tray.push(SHAPES[(Math.random() * SHAPES.length) | 0]); }
+    function hud() {
+      body.querySelector('#bkScore').textContent = score;
+      body.querySelector('#bkStreak').textContent = '×' + (1 + Math.min(streak, 4));
+      body.querySelector('#bkBest').textContent = Math.max(score, Stats.get('bloki').best || 0);
+    }
+    function paint() { board.forEach((v, i) => { cells[i].style.background = v || '#232323'; }); }
+    function fits(sh, anchor) {
+      const r0 = (anchor / N) | 0, c0 = anchor % N;
+      return sh.c.every(([r, c]) => r0 + r < N && c0 + c < N && !board[(r0 + r) * N + c0 + c]);
+    }
+    function anyMove() { return tray.some(sh => board.some((_, i) => fits(sh, i))); }
+    function preview(i, on) {
+      if (sel < 0 || !tray[sel] || over) return;
+      const sh = tray[sel]; if (!fits(sh, i)) return;
+      const r0 = (i / N) | 0, c0 = i % N;
+      sh.c.forEach(([r, c]) => { const k = (r0 + r) * N + c0 + c; if (!board[k]) cells[k].style.background = on ? '#3a3a3a' : '#232323'; });
+    }
+    function tryPlace(i) {
+      if (over) return;
+      if (sel < 0 || !tray[sel]) { UI.toast('Najpierw wybierz klocek z dołu 👇', 'info', 1200); return; }
+      const sh = tray[sel];
+      if (!fits(sh, i)) { UI.toast('Tu się nie zmieści 😅', 'err', 900); return; }
+      const r0 = (i / N) | 0, c0 = i % N;
+      sh.c.forEach(([r, c]) => { board[(r0 + r) * N + c0 + c] = sh.col; });
+      score += sh.c.length;
+      tray.splice(sel, 1); sel = -1;
+      clearLines();
+      if (!tray.length) refill();
+      paint(); drawTray(); hud();
+      if (!anyMove()) finish();
+    }
+    function clearLines() {
+      const rows = [], cols = [];
+      for (let r = 0; r < N; r++) if (Array.from({ length: N }, (_, c) => board[r * N + c]).every(Boolean)) rows.push(r);
+      for (let c = 0; c < N; c++) if (Array.from({ length: N }, (_, r) => board[r * N + c]).every(Boolean)) cols.push(c);
+      const lines = rows.length + cols.length;
+      if (!lines) { streak = 0; return; }
+      rows.forEach(r => { for (let c = 0; c < N; c++) board[r * N + c] = null; });
+      cols.forEach(c => { for (let r = 0; r < N; r++) board[r * N + c] = null; });
+      streak++;
+      const mult = 1 + Math.min(streak, 4);
+      const pts = lines * 10 * lines * mult;
+      score += pts;
+      UI.toast(`+${pts} pkt! ${lines > 1 ? 'MULTI-LINIA! 🔥' : 'Linia! ✨'}${streak > 1 ? ' Seria ×' + mult : ''}`, 'ok', 1300);
+    }
+    function drawTray() {
+      trayEl.innerHTML = '';
+      tray.forEach((sh, idx) => {
+        const rows = Math.max(...sh.c.map(x => x[0])) + 1, colsN = Math.max(...sh.c.map(x => x[1])) + 1;
+        const w = document.createElement('div');
+        w.style.cssText = `display:grid;grid-template-columns:repeat(${colsN},16px);grid-auto-rows:16px;gap:2px;padding:8px;border-radius:10px;cursor:pointer;border:2px solid ${idx === sel ? '#FFD400' : 'transparent'};background:${idx === sel ? '#1f1c10' : '#191919'}`;
+        const map = {}; sh.c.forEach(([r, c]) => map[r + '_' + c] = 1);
+        for (let r = 0; r < rows; r++) for (let c = 0; c < colsN; c++) {
+          const s = document.createElement('div');
+          s.style.cssText = `border-radius:3px;background:${map[r + '_' + c] ? sh.col : 'transparent'}`;
+          w.appendChild(s);
+        }
+        w.onclick = () => { sel = (sel === idx ? -1 : idx); drawTray(); };
+        trayEl.appendChild(w);
+      });
+    }
+    function finish() {
+      over = true;
+      const nr = Stats.max('bloki', 'best', score);
+      UI.toast((nr ? 'NOWY REKORD! ' : 'Koniec gry! ') + score + ' pkt 🧱', nr ? 'ok' : 'info', 3000);
+      body.querySelector('#bkAgain').style.display = 'block';
+    }
+    body.querySelector('#bkAgain').onclick = reset;
+    reset();
+  }
+
+  /* ===================== 2048 ========================================== */
+  /* Pełny klasyk: przesuwanie strzałkami i gestami (swipe), łączenie
+     kafelków, wynik + rekord, wykrycie wygranej (2048, można grać dalej)
+     i przegranej. Kolory kafelków w palecie strony. */
+  function launch2048() {
+    Stats.play('g2048');
+    const N = 4;
+    const COLS = { 2:'#2b2b2b',4:'#3a3a2b',8:'#8a6d1a',16:'#b8860b',32:'#FFD400',64:'#FB923C',128:'#FF3B30',256:'#e11d48',512:'#A78BFA',1024:'#60A5FA',2048:'#34D399' };
+    let grid, score, won, over;
+
+    const body = UI.modal(`
+      <div class="gamewrap">
+        <div class="gamehud"><div>Punkty: <b id="tScore">0</b></div><div>Rekord: <b id="tBest">${Stats.get('g2048').best || 0}</b></div></div>
+        <div id="tBoard" style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;background:#151515;border:1px solid #2e2e2e;border-radius:14px;padding:10px;touch-action:none;user-select:none"></div>
+        <p class="muted micro" style="margin:8px 0 4px;text-align:center">Przesuń palcem lub strzałkami. Łącz takie same kafelki.</p>
+        <button class="btn btn--block" id="tAgain" style="display:none">Zagraj ponownie</button>
+      </div>`, { title: '🔢 2048' });
+
+    const boardEl = body.querySelector('#tBoard');
+    const tiles = [];
+    for (let i = 0; i < N * N; i++) {
+      const d = document.createElement('div');
+      d.style.cssText = 'aspect-ratio:1;border-radius:10px;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:1.25rem;background:#232323;color:#f5f5f0;transition:background .1s';
+      boardEl.appendChild(d); tiles.push(d);
+    }
+    function spawn() {
+      const free = grid.map((v, i) => v ? -1 : i).filter(i => i >= 0);
+      if (!free.length) return;
+      grid[free[(Math.random() * free.length) | 0]] = Math.random() < 0.9 ? 2 : 4;
+    }
+    function paint() {
+      grid.forEach((v, i) => {
+        tiles[i].textContent = v || '';
+        tiles[i].style.background = v ? (COLS[v] || '#34D399') : '#232323';
+        tiles[i].style.color = v >= 32 && v < 512 ? '#141414' : '#f5f5f0';
+        tiles[i].style.fontSize = v >= 1024 ? '0.95rem' : v >= 128 ? '1.1rem' : '1.25rem';
+      });
+      body.querySelector('#tScore').textContent = score;
+      body.querySelector('#tBest').textContent = Math.max(score, Stats.get('g2048').best || 0);
+    }
+    function line(get, set) {
+      let vals = [];
+      for (let i = 0; i < N; i++) { const v = get(i); if (v) vals.push(v); }
+      let moved = vals.length !== N || vals.some((v, i) => v !== get(i));
+      const out = [];
+      for (let i = 0; i < vals.length; i++) {
+        if (vals[i] === vals[i + 1]) { const m = vals[i] * 2; out.push(m); score += m; if (m === 2048) won = true; i++; moved = true; }
+        else out.push(vals[i]);
+      }
+      while (out.length < N) out.push(0);
+      for (let i = 0; i < N; i++) set(i, out[i]);
+      return moved;
+    }
+    function move(dir) { // 0← 1→ 2↑ 3↓
+      if (over) return;
+      let moved = false;
+      for (let k = 0; k < N; k++) {
+        const idx = i => dir === 0 ? k * N + i : dir === 1 ? k * N + (N - 1 - i) : dir === 2 ? i * N + k : (N - 1 - i) * N + k;
+        if (line(i => grid[idx(i)], (i, v) => grid[idx(i)] = v)) moved = true;
+      }
+      if (!moved) return;
+      spawn(); paint();
+      if (won) { won = false; UI.toast('2048! Jesteś legendą 👑 Graj dalej!', 'ok', 3000); }
+      if (!canMove()) {
+        over = true;
+        const nr = Stats.max('g2048', 'best', score);
+        UI.toast((nr ? 'NOWY REKORD! ' : 'Koniec gry! ') + score + ' pkt', nr ? 'ok' : 'info', 3000);
+        body.querySelector('#tAgain').style.display = 'block';
+      }
+    }
+    function canMove() {
+      for (let i = 0; i < N * N; i++) {
+        if (!grid[i]) return true;
+        const r = (i / N) | 0, c = i % N;
+        if (c < N - 1 && grid[i] === grid[i + 1]) return true;
+        if (r < N - 1 && grid[i] === grid[i + N]) return true;
+      }
+      return false;
+    }
+    const onKey = ev => {
+      const m = { ArrowLeft: 0, ArrowRight: 1, ArrowUp: 2, ArrowDown: 3 }[ev.key];
+      if (m == null) return; ev.preventDefault(); move(m);
+    };
+    document.addEventListener('keydown', onKey);
+    let sx = 0, sy = 0;
+    boardEl.addEventListener('touchstart', ev => { sx = ev.touches[0].clientX; sy = ev.touches[0].clientY; }, { passive: true });
+    boardEl.addEventListener('touchend', ev => {
+      const dx = ev.changedTouches[0].clientX - sx, dy = ev.changedTouches[0].clientY - sy;
+      if (Math.max(Math.abs(dx), Math.abs(dy)) < 24) return;
+      move(Math.abs(dx) > Math.abs(dy) ? (dx > 0 ? 1 : 0) : (dy > 0 ? 3 : 2));
+    }, { passive: true });
+    const mo = new MutationObserver(() => { if (!document.body.contains(boardEl)) { document.removeEventListener('keydown', onKey); mo.disconnect(); } });
+    mo.observe(document.body, { childList: true, subtree: true });
+    function reset() { grid = Array(N * N).fill(0); score = 0; won = false; over = false; body.querySelector('#tAgain').style.display = 'none'; spawn(); spawn(); paint(); }
+    body.querySelector('#tAgain').onclick = reset;
+    reset();
   }
 
   /* ===================== QUIZ ========================================= */
