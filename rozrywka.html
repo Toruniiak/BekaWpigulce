@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Rozrywka — gry i quizy — BekaWpigułce 🎮</title>
-<meta name="description" content="Mini-gry w przeglądarce z zapisem rekordów: Wężyk, Motorek, Saper, Złap Mema, Mem Memory, Klikolot oraz Ubieranka. Plus interaktywne quizy i wyzwania.">
+<meta name="description" content="Mini-gry z rekordami i osiągnięciami: Bloki 10×10, 2048, Labirynt z 12 poziomami, Sekwencja, Wężyk, Saper i więcej. Plus ponad 35 quizów i wyzwania.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Archivo:ital,wght@0,600;0,800;0,900;1,900&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -17,7 +17,7 @@
   <h1 style="font-family:var(--disp);font-weight:900;font-size:clamp(2rem,6vw,3.2rem);letter-spacing:-.02em">
     Rozrywka 🎮 <span style="color:var(--yellow)">na chwilę przerwy</span>
   </h1>
-  <p class="muted" style="max-width:58ch;margin-top:8px">Mini-gry, które odpalisz w przeglądarce bez instalacji, quiz na rozgrzewkę i wyzwania, w których możesz coś wygrać.</p>
+  <p class="muted" style="max-width:58ch;margin-top:8px">Mini-gry bez instalacji — z rekordami, poziomami do odblokowania i 24 osiągnięciami 🏆. Do tego ponad 35 quizów i wyzwania.</p>
 </header>
 
 <div class="wrap" style="margin-top:18px"><div data-ad="top"></div></div>
@@ -29,6 +29,10 @@
     <div class="sec-head">
       <h2 class="sec-h">Mini-<span class="ac">gry</span></h2>
       <span class="muted micro">Klik = graj</span>
+    </div>
+    <div class="chips-row" style="margin-bottom:12px">
+      <button class="fchip" id="openAch">🏆 Osiągnięcia <span id="achCount" style="color:var(--yellow)"></span></button>
+      <button class="fchip" id="openStats">📊 Moje statystyki</button>
     </div>
     <div class="grid grid-4" id="gamesGrid"></div>
   </section>
@@ -56,6 +60,7 @@
 </main>
 
 <script src="content.js"></script>
+<script src="quizy-plus.js"></script>
 <script src="db.js"></script>
 <script src="shell.js"></script>
 <script src="rozrywka.js"></script>

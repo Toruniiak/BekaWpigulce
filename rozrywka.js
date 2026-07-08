@@ -13,20 +13,88 @@
     key: c => 'bwp_game_' + c,
     get(c) { try { return JSON.parse(localStorage.getItem(Stats.key(c))) || {}; } catch (err) { return {}; } },
     save(c, o) { try { localStorage.setItem(Stats.key(c), JSON.stringify(o)); } catch (err) {} },
-    play(c) { const s = Stats.get(c); s.plays = (s.plays || 0) + 1; Stats.save(c, s); return s; },
-    max(c, f, v) { const s = Stats.get(c); let nr = false; if (v > (s[f] || 0)) { s[f] = v; nr = true; } Stats.save(c, s); return nr; },
-    min(c, f, v) { const s = Stats.get(c); let nr = false; if (s[f] == null || v < s[f]) { s[f] = v; nr = true; } Stats.save(c, s); return nr; }
+    play(c) { const s = Stats.get(c); s.plays = (s.plays || 0) + 1; Stats.save(c, s); Ach.later(); return s; },
+    max(c, f, v) { const s = Stats.get(c); let nr = false; if (v > (s[f] || 0)) { s[f] = v; nr = true; } Stats.save(c, s); Ach.later(); return nr; },
+    min(c, f, v) { const s = Stats.get(c); let nr = false; if (s[f] == null || v < s[f]) { s[f] = v; nr = true; } Stats.save(c, s); Ach.later(); return nr; },
+    add(c, f, d) { const s = Stats.get(c); s[f] = (s[f] || 0) + d; Stats.save(c, s); Ach.later(); return s[f]; },
+    flag(c, f) { const s = Stats.get(c); if (!s[f]) { s[f] = 1; Stats.save(c, s); Ach.later(); } }
   };
+
+  /* Poziomy odblokowane w grach poziomowych (labirynt) */
+  const Levels = {
+    key: 'bwp_levels',
+    all() { try { return JSON.parse(localStorage.getItem(Levels.key)) || {}; } catch (e) { return {}; } },
+    unlocked(g) { return Levels.all()[g] || 1; },
+    unlock(g, lvl) {
+      const a = Levels.all();
+      if (lvl > (a[g] || 1)) { a[g] = lvl; try { localStorage.setItem(Levels.key, JSON.stringify(a)); } catch (e) {} }
+      Ach.later();
+    }
+  };
+
+  /* ----------------- OSIĄGNIĘCIA 🏆 -------------------------------------- */
+  const PLAYABLE = ['lap', 'memory', 'reflex', 'snake', 'runner', 'saper', 'bloki', 'g2048', 'labirynt', 'simon'];
+  const ACH_DEFS = [
+    { id: 'first_play', icon: '🎮', name: 'Pierwsze kroki', desc: 'Zagraj w dowolną grę', cond: () => PLAYABLE.some(c => Stats.get(c).plays) },
+    { id: 'five_games', icon: '🕹️', name: 'Degustator', desc: 'Zagraj w 5 różnych gier', cond: () => PLAYABLE.filter(c => Stats.get(c).plays).length >= 5 },
+    { id: 'all_games', icon: '🎰', name: 'Kolekcjoner gier', desc: 'Zagraj we wszystkie gry', cond: () => PLAYABLE.every(c => Stats.get(c).plays) },
+    { id: 'plays_50', icon: '🔥', name: 'Maratończyk', desc: '50 rozgrywek łącznie', cond: () => PLAYABLE.reduce((s, c) => s + (Stats.get(c).plays || 0), 0) >= 50 },
+    { id: 'bloki_100', icon: '🧱', name: 'Murarz', desc: '100 pkt w Blokach 10×10', cond: () => (Stats.get('bloki').best || 0) >= 100 },
+    { id: 'bloki_400', icon: '🏗️', name: 'Architekt', desc: '400 pkt w Blokach 10×10', cond: () => (Stats.get('bloki').best || 0) >= 400 },
+    { id: 'g2048_1500', icon: '🔢', name: 'Liczykrupa', desc: '1500 pkt w 2048', cond: () => (Stats.get('g2048').best || 0) >= 1500 },
+    { id: 'g2048_win', icon: '👑', name: 'Legenda 2048', desc: 'Zbuduj kafelek 2048', cond: () => !!Stats.get('g2048').won2048 },
+    { id: 'snake_15', icon: '🐍', name: 'Zaklinacz węży', desc: '15 pkt w Wężu', cond: () => (Stats.get('snake').best || 0) >= 15 },
+    { id: 'saper_win', icon: '💣', name: 'Saper-profeska', desc: 'Wygraj partię Sapera', cond: () => !!Stats.get('saper').bestTime },
+    { id: 'memory_sharp', icon: '🃏', name: 'Fotograficzna pamięć', desc: 'Memory w max 22 ruchach', cond: () => { const m = Stats.get('memory').bestMoves; return m && m <= 22; } },
+    { id: 'lab_1', icon: '🌱', name: 'Wyjście z cienia', desc: 'Ukończ 1. poziom Labiryntu', cond: () => Levels.unlocked('labirynt') >= 2 },
+    { id: 'lab_6', icon: '🧭', name: 'Nawigator', desc: 'Odblokuj 6. poziom Labiryntu', cond: () => Levels.unlocked('labirynt') >= 6 },
+    { id: 'lab_12', icon: '🏆', name: 'Pan Labiryntu', desc: 'Ukończ wszystkie 12 poziomów', cond: () => Levels.unlocked('labirynt') >= 13 },
+    { id: 'simon_8', icon: '🧠', name: 'Słoniowa pamięć', desc: 'Runda 8 w Sekwencji', cond: () => (Stats.get('simon').best || 0) >= 8 },
+    { id: 'simon_12', icon: '🐘', name: 'Mózg elektronowy', desc: 'Runda 12 w Sekwencji', cond: () => (Stats.get('simon').best || 0) >= 12 },
+    { id: 'quiz_first', icon: '❓', name: 'Quizowicz', desc: 'Ukończ pierwszy quiz', cond: () => (Stats.get('quiz').plays || 0) >= 1 },
+    { id: 'quiz_10', icon: '📚', name: 'Encyklopedysta', desc: 'Ukończ 10 quizów', cond: () => (Stats.get('quiz').plays || 0) >= 10 },
+    { id: 'quiz_perfect', icon: '💯', name: 'Bezbłędny', desc: 'Quiz na 100%', cond: () => (Stats.get('quiz').perfects || 0) >= 1 },
+    { id: 'quiz_5perfect', icon: '🎓', name: 'Profesor beki', desc: '5 quizów na 100%', cond: () => (Stats.get('quiz').perfects || 0) >= 5 },
+    { id: 'fav_5', icon: '⭐', name: 'Kolekcjoner beki', desc: 'Dodaj 5 memów do ulubionych', cond: () => DB.favorites.count() >= 5 },
+    { id: 'voter_10', icon: '🗳️', name: 'Głos ludu', desc: 'Oddaj 10 głosów na memy', cond: () => { try { return Object.keys(JSON.parse(localStorage.getItem('bwp_votes') || '{}')).length >= 10; } catch (e) { return false; } } },
+    { id: 'author', icon: '📤', name: 'Twórca', desc: 'Wyślij swojego mema', cond: () => !!localStorage.getItem('bwp_submitted') },
+    { id: 'commenter', icon: '💬', name: 'Komentator', desc: 'Napisz komentarz', cond: () => !!localStorage.getItem('bwp_commented') }
+  ];
+  const Ach = {
+    key: 'bwp_ach',
+    got() { try { return JSON.parse(localStorage.getItem(Ach.key)) || {}; } catch (e) { return {}; } },
+    later() { clearTimeout(Ach._t); Ach._t = setTimeout(Ach.evaluate, 250); },
+    evaluate() {
+      const got = Ach.got(); let dirty = false, delay = 0;
+      ACH_DEFS.forEach(a => {
+        if (got[a.id]) return;
+        let ok = false; try { ok = a.cond(); } catch (e) {}
+        if (ok) {
+          got[a.id] = Date.now(); dirty = true;
+          setTimeout(() => UI.toast(`🏆 Osiągnięcie: ${a.icon} ${a.name}!`, 'ok', 3200), delay);
+          delay += 900;
+        }
+      });
+      if (dirty) { try { localStorage.setItem(Ach.key, JSON.stringify(got)); } catch (e) {} Ach.badge(); }
+    },
+    badge() {
+      const b = document.querySelector('#achCount');
+      if (b) b.textContent = `${Object.keys(Ach.got()).length}/${ACH_DEFS.length}`;
+    }
+  };
+
   function recLabel(code) {
     const s = Stats.get(code);
     if (code === 'saper') return s.bestTime ? `Najlepszy czas: ${s.bestTime}s` : (s.plays ? `Rozegrane: ${s.plays}` : 'Zagraj!');
     if (code === 'memory') return s.bestMoves ? `Najmniej ruchów: ${s.bestMoves}` : 'Zagraj!';
     if (code === 'ubieranka') return 'Stwórz i pobierz 📸';
+    if (code === 'labirynt') { const u = Levels.unlocked('labirynt'); return u > 12 ? 'Ukończone! 🏆' : `Poziom: ${Math.min(u, 12)}/12`; }
+    if (code === 'simon') return s.best ? `Rekord: runda ${s.best}` : 'Zagraj!';
     return s.best ? `Twój rekord: ${s.best}` : 'Zagraj!';
   }
 
-  const GAME_ICONS = { lap: '🎯', memory: '🃏', reflex: '⚡', snake: '🐍', runner: '🏍️', saper: '💣', ubieranka: '🎽', bloki: '🧱', g2048: '🔢' };
-  const LAUNCHERS = { lap: launchCatch, memory: launchMemory, reflex: launchReflex, snake: launchSnake, runner: launchRunner, saper: launchSaper, ubieranka: launchUbieranka, bloki: launchBloki, g2048: launch2048 };
+  const GAME_ICONS = { lap: '🎯', memory: '🃏', reflex: '⚡', snake: '🐍', runner: '🏍️', saper: '💣', ubieranka: '🎽', bloki: '🧱', g2048: '🔢', labirynt: '🌀', simon: '🚦' };
+  const LAUNCHERS = { lap: launchCatch, memory: launchMemory, reflex: launchReflex, snake: launchSnake, runner: launchRunner, saper: launchSaper, ubieranka: launchUbieranka, bloki: launchBloki, g2048: launch2048, labirynt: launchLabirynt, simon: launchSimon };
 
   /* --- kafelki gier --- */
   const grid = $('#gamesGrid');
@@ -585,7 +653,7 @@
       }
       if (!moved) return;
       spawn(); paint();
-      if (won) { won = false; UI.toast('2048! Jesteś legendą 👑 Graj dalej!', 'ok', 3000); }
+      if (won) { won = false; Stats.flag('g2048', 'won2048'); UI.toast('2048! Jesteś legendą 👑 Graj dalej!', 'ok', 3000); }
       if (!canMove()) {
         over = true;
         const nr = Stats.max('g2048', 'best', score);
@@ -621,6 +689,207 @@
     reset();
   }
 
+  /* ===================== LABIRYNT (12 poziomów) ========================= */
+  /* Labirynty generowane deterministycznie (seed = numer poziomu), więc
+     każdy gracz dostaje te same plansze. Kolejny poziom odblokowuje się po
+     ukończeniu poprzedniego; najlepszy czas każdego poziomu jest zapisywany. */
+  function launchLabirynt() {
+    const body = UI.modal(`<div class="gamewrap"><div id="labHome"></div></div>`, { title: '🌀 Labirynt' });
+    const home = body.querySelector('#labHome');
+
+    function rng(seed) { let s = seed; return () => (s = (s * 16807) % 2147483647) / 2147483647; }
+    function genMaze(lvl) {
+      const size = 9 + 2 * Math.floor((lvl - 1) / 3); // 9,9,9,11,11,11,13,13,13,15,15,15
+      const r = rng(1000 + lvl * 7);
+      const g = Array.from({ length: size }, () => Array(size).fill(1));
+      const stack = [[1, 1]]; g[1][1] = 0;
+      while (stack.length) {
+        const [x, y] = stack[stack.length - 1];
+        const dirs = [[2, 0], [-2, 0], [0, 2], [0, -2]].sort(() => r() - 0.5);
+        let moved = false;
+        for (const [dx, dy] of dirs) {
+          const nx = x + dx, ny = y + dy;
+          if (nx > 0 && ny > 0 && nx < size - 1 && ny < size - 1 && g[ny][nx] === 1) {
+            g[ny][nx] = 0; g[y + dy / 2][x + dx / 2] = 0; stack.push([nx, ny]); moved = true; break;
+          }
+        }
+        if (!moved) stack.pop();
+      }
+      return { g, size };
+    }
+
+    function menu() {
+      const unlocked = Levels.unlocked('labirynt');
+      home.innerHTML = `
+        <p class="muted micro" style="margin-bottom:10px">Ukończ poziom, żeby odblokować następny. Czasy się zapisują!</p>
+        <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px">
+          ${Array.from({ length: 12 }, (_, i) => {
+            const lvl = i + 1, open = lvl <= unlocked;
+            const best = Stats.get('labirynt')['t' + lvl];
+            return `<button class="btn ${open ? '' : 'btn--ghost'}" data-lvl="${lvl}" ${open ? '' : 'disabled'}
+              style="flex-direction:column;padding:10px 4px;${open ? '' : 'opacity:.45'}">
+              <b style="font-size:1.1rem">${open ? lvl : '🔒'}</b>
+              <span class="micro" style="opacity:.8">${best ? '⏱ ' + best + 's' : (open ? 'graj' : 'poziom ' + lvl)}</span>
+            </button>`;
+          }).join('')}
+        </div>`;
+      home.querySelectorAll('[data-lvl]').forEach(b => b.onclick = () => play(+b.dataset.lvl));
+    }
+
+    function play(lvl) {
+      Stats.play('labirynt');
+      const { g, size } = genMaze(lvl);
+      let px = 1, py = 1, moves = 0, done = false;
+      const start = Date.now();
+      home.innerHTML = `
+        <div class="gamehud"><div>Poziom: <b>${lvl}/12</b></div><div>Czas: <b id="labT">0</b>s</div><div>Ruchy: <b id="labM">0</b></div></div>
+        <div id="labB" style="display:grid;grid-template-columns:repeat(${size},1fr);gap:1px;background:#151515;border:1px solid #2e2e2e;border-radius:12px;padding:6px;touch-action:none"></div>
+        <div style="display:grid;grid-template-columns:repeat(3,64px);gap:6px;justify-content:center;margin-top:10px">
+          <span></span><button class="btn btn--ghost" data-d="up">▲</button><span></span>
+          <button class="btn btn--ghost" data-d="left">◀</button>
+          <button class="btn btn--ghost" data-d="down">▼</button>
+          <button class="btn btn--ghost" data-d="right">▶</button>
+        </div>
+        <button class="btn btn--ghost btn--block" id="labBack" style="margin-top:10px">↩ Wybór poziomu</button>`;
+      const bEl = home.querySelector('#labB'), cells = [];
+      for (let y = 0; y < size; y++) for (let x = 0; x < size; x++) {
+        const c = document.createElement('div');
+        c.style.cssText = `aspect-ratio:1;border-radius:2px;background:${g[y][x] ? '#2b2b2b' : '#171717'}`;
+        bEl.appendChild(c); cells.push(c);
+      }
+      const exit = [size - 2, size - 2];
+      const paint = () => {
+        cells.forEach((c, i) => {
+          const x = i % size, y = (i / size) | 0;
+          c.textContent = ''; c.style.background = g[y][x] ? '#2b2b2b' : '#171717';
+          c.style.fontSize = Math.max(10, 230 / size) + 'px';
+          c.style.display = 'flex'; c.style.alignItems = 'center'; c.style.justifyContent = 'center';
+          if (x === exit[0] && y === exit[1]) { c.textContent = '🚪'; }
+          if (x === px && y === py) { c.textContent = '🙂'; c.style.background = '#3a3410'; }
+        });
+      };
+      const tick = setInterval(() => { if (!done) home.querySelector('#labT').textContent = ((Date.now() - start) / 1000) | 0; }, 250);
+      const move = (dx, dy) => {
+        if (done) return;
+        const nx = px + dx, ny = py + dy;
+        if (g[ny] && g[ny][nx] === 0) {
+          px = nx; py = ny; moves++;
+          home.querySelector('#labM').textContent = moves;
+          paint();
+          if (px === exit[0] && py === exit[1]) finishLvl();
+        }
+      };
+      function finishLvl() {
+        done = true; clearInterval(tick);
+        const t = Math.max(1, ((Date.now() - start) / 1000) | 0);
+        Stats.min('labirynt', 't' + lvl, t);
+        Stats.add('labirynt', 'wins', 1);
+        Levels.unlock('labirynt', lvl + 1);
+        UI.toast(`Poziom ${lvl} zaliczony w ${t}s! ${lvl < 12 ? '🔓 Poziom ' + (lvl + 1) + ' odblokowany!' : '🏆 WSZYSTKIE POZIOMY UKOŃCZONE!'}`, 'ok', 3200);
+        setTimeout(menu, 1100);
+      }
+      const DIRS = { up: [0, -1], down: [0, 1], left: [-1, 0], right: [1, 0] };
+      home.querySelectorAll('[data-d]').forEach(b => b.onclick = () => move(...DIRS[b.dataset.d]));
+      const onKey = ev => {
+        const m = { ArrowUp: 'up', ArrowDown: 'down', ArrowLeft: 'left', ArrowRight: 'right' }[ev.key];
+        if (m) { ev.preventDefault(); move(...DIRS[m]); }
+      };
+      document.addEventListener('keydown', onKey);
+      let sx = 0, sy = 0;
+      bEl.addEventListener('touchstart', ev => { sx = ev.touches[0].clientX; sy = ev.touches[0].clientY; }, { passive: true });
+      bEl.addEventListener('touchend', ev => {
+        const dx = ev.changedTouches[0].clientX - sx, dy = ev.changedTouches[0].clientY - sy;
+        if (Math.max(Math.abs(dx), Math.abs(dy)) < 22) return;
+        move(...(Math.abs(dx) > Math.abs(dy) ? DIRS[dx > 0 ? 'right' : 'left'] : DIRS[dy > 0 ? 'down' : 'up']));
+      }, { passive: true });
+      const mo = new MutationObserver(() => { if (!document.body.contains(bEl)) { document.removeEventListener('keydown', onKey); clearInterval(tick); mo.disconnect(); } });
+      mo.observe(document.body, { childList: true, subtree: true });
+      home.querySelector('#labBack').onclick = () => { done = true; clearInterval(tick); document.removeEventListener('keydown', onKey); menu(); };
+      paint();
+    }
+    menu();
+  }
+
+  /* ===================== SIMON — POWTÓRZ SEKWENCJĘ ====================== */
+  /* Cztery pola, sekwencja rośnie co rundę. Dźwięki WebAudio, rangi za
+     osiągnięte rundy, rekord zapisywany. */
+  function launchSimon() {
+    const PADS = [
+      { col: '#FFD400', dim: '#5c4d00', f: 329.6 },
+      { col: '#FF3B30', dim: '#5a1512', f: 261.6 },
+      { col: '#34D399', dim: '#0f4436', f: 392.0 },
+      { col: '#60A5FA', dim: '#16344f', f: 196.0 }
+    ];
+    const RANKS = [[12, 'Mózg elektronowy 🐘'], [10, 'Złota pamięć 🥇'], [8, 'Srebrna pamięć 🥈'], [5, 'Brązowa pamięć 🥉']];
+    let seq = [], pos = 0, round = 0, busy = true, over = false, ac = null;
+
+    const body = UI.modal(`
+      <div class="gamewrap">
+        <div class="gamehud"><div>Runda: <b id="siR">0</b></div><div>Rekord: <b id="siB">${Stats.get('simon').best || 0}</b></div></div>
+        <p class="muted micro" id="siMsg" style="text-align:center;margin:4px 0 10px">Obserwuj sekwencję, potem ją powtórz.</p>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;max-width:340px;margin:0 auto">
+          ${PADS.map((p, i) => `<button data-p="${i}" style="aspect-ratio:1;border:none;border-radius:18px;background:${p.dim};cursor:pointer;transition:background .12s"></button>`).join('')}
+        </div>
+        <button class="btn btn--block" id="siStart" style="margin-top:14px">▶ Start</button>
+      </div>`, { title: '🚦 Powtórz sekwencję' });
+
+    const pads = [...body.querySelectorAll('[data-p]')];
+    const msg = body.querySelector('#siMsg');
+    function beep(f, dur = 0.22) {
+      try {
+        ac = ac || new (window.AudioContext || window.webkitAudioContext)();
+        const o = ac.createOscillator(), g = ac.createGain();
+        o.frequency.value = f; o.type = 'sine';
+        g.gain.setValueAtTime(0.18, ac.currentTime);
+        g.gain.exponentialRampToValueAtTime(0.001, ac.currentTime + dur);
+        o.connect(g).connect(ac.destination); o.start(); o.stop(ac.currentTime + dur);
+      } catch (e) {}
+    }
+    const flash = (i, dur = 320) => new Promise(res => {
+      pads[i].style.background = PADS[i].col; beep(PADS[i].f, dur / 1000);
+      setTimeout(() => { pads[i].style.background = PADS[i].dim; setTimeout(res, 110); }, dur);
+    });
+    async function playSeq() {
+      busy = true; msg.textContent = 'Patrz uważnie… 👀';
+      await new Promise(r => setTimeout(r, 550));
+      for (const i of seq) { if (over) return; await flash(i, Math.max(180, 340 - round * 12)); }
+      busy = false; pos = 0; msg.textContent = 'Twoja kolej — powtórz!';
+    }
+    function nextRound() {
+      round++; body.querySelector('#siR').textContent = round;
+      seq.push((Math.random() * 4) | 0);
+      playSeq();
+    }
+    pads.forEach((p, i) => p.onclick = async () => {
+      if (busy || over) return;
+      await flash(i, 170);
+      if (i === seq[pos]) {
+        pos++;
+        if (pos === seq.length) {
+          const nr = Stats.max('simon', 'best', round);
+          if (nr) body.querySelector('#siB').textContent = round;
+          msg.textContent = 'Dobrze! 🔥';
+          setTimeout(nextRound, 650);
+          busy = true;
+        }
+      } else {
+        over = true; busy = true;
+        beep(110, 0.5);
+        const best = Stats.get('simon').best || 0;
+        const rank = (RANKS.find(r => round >= r[0]) || [0, 'Świeżak — daj się rozgrzać 🙂'])[1];
+        msg.innerHTML = `Koniec! Dotarłeś do rundy <b style="color:var(--yellow)">${round}</b> · ${rank}<br><span class="micro muted">rekord: ${best}</span>`;
+        body.querySelector('#siStart').style.display = 'block';
+        body.querySelector('#siStart').textContent = '↻ Jeszcze raz';
+      }
+    });
+    body.querySelector('#siStart').onclick = function () {
+      this.style.display = 'none';
+      seq = []; round = 0; over = false;
+      Stats.play('simon');
+      nextRound();
+    };
+  }
+
   /* ===================== QUIZ ========================================= */
   function launchQuiz(quizId) {
     const q = quizId ? DB.quizzes.byId(quizId) : DB.quizzes.main();
@@ -647,10 +916,62 @@
     }
     function finish() {
       const pct = Math.round(score / questions.length * 100);
+      Stats.play('quiz'); Stats.add('quiz', 'correct', score);
+      if (pct === 100) Stats.add('quiz', 'perfects', 1);
       const verdict = pct === 100 ? 'Mistrz! 👑' : pct >= 60 ? 'Nieźle 😎' : pct >= 40 ? 'Może być 🙂' : 'Douczysz się 😅';
       body.innerHTML = `<div class="quiz-final"><b>${score}/${questions.length}</b><p class="muted" style="margin:10px 0">${verdict} (${pct}%)</p><button class="btn" id="qAgain">Zagraj jeszcze raz</button></div>`;
       body.querySelector('#qAgain').onclick = () => launchQuiz(quizId);
     }
     step();
   }
+
+  /* ===================== OSIĄGNIĘCIA I STATYSTYKI — UI ================== */
+  const achBtn = $('#openAch'), statsBtn = $('#openStats');
+  if (achBtn) achBtn.onclick = () => {
+    const got = Ach.got();
+    const done = ACH_DEFS.filter(a => got[a.id]).length;
+    UI.modal(`
+      <p class="muted micro" style="margin-bottom:12px">Odblokowane: <b style="color:var(--yellow)">${done}/${ACH_DEFS.length}</b> — graj, głosuj i twórz, żeby zgarnąć resztę!</p>
+      <div style="display:grid;gap:8px;max-height:60vh;overflow:auto">
+        ${ACH_DEFS.map(a => {
+          const on = !!got[a.id];
+          return `<div style="display:flex;gap:12px;align-items:center;padding:10px 12px;border-radius:12px;
+            background:${on ? '#1f1c10' : '#191919'};border:1px solid ${on ? 'var(--yellow)' : '#2a2a2a'};${on ? '' : 'opacity:.55;filter:grayscale(.6)'}">
+            <span style="font-size:1.6rem">${on ? a.icon : '🔒'}</span>
+            <div style="flex:1"><b>${a.name}</b><div class="micro muted">${a.desc}</div></div>
+            ${on ? '<span style="color:var(--yellow)">✓</span>' : ''}
+          </div>`;
+        }).join('')}
+      </div>`, { title: '🏆 Osiągnięcia' });
+  };
+  if (statsBtn) statsBtn.onclick = () => {
+    const NAMES = { lap: '🎯 Złap Mema', memory: '🃏 Memory', reflex: '⚡ Klikolot', snake: '🐍 Wężyk', runner: '🏍️ Motorek', saper: '💣 Saper', bloki: '🧱 Bloki 10×10', g2048: '🔢 2048', labirynt: '🌀 Labirynt', simon: '🚦 Sekwencja' };
+    const rows = PLAYABLE.map(c => {
+      const s = Stats.get(c);
+      let rec = s.best ? 'rekord: ' + s.best : '';
+      if (c === 'saper') rec = s.bestTime ? 'najlepszy czas: ' + s.bestTime + 's' : '';
+      if (c === 'memory') rec = s.bestMoves ? 'najmniej ruchów: ' + s.bestMoves : '';
+      if (c === 'labirynt') rec = 'poziom: ' + Math.min(Levels.unlocked('labirynt'), 12) + '/12' + (s.wins ? ' · przejścia: ' + s.wins : '');
+      if (c === 'simon') rec = s.best ? 'rekord: runda ' + s.best : '';
+      return `<tr><td>${NAMES[c]}</td><td style="text-align:center">${s.plays || 0}</td><td class="micro muted">${rec || '—'}</td></tr>`;
+    }).join('');
+    const q = Stats.get('quiz');
+    const totalPlays = PLAYABLE.reduce((s, c) => s + (Stats.get(c).plays || 0), 0);
+    UI.modal(`
+      <div class="gamehud" style="margin-bottom:10px">
+        <div>Rozgrywki: <b>${totalPlays}</b></div>
+        <div>Quizy: <b>${q.plays || 0}</b></div>
+        <div>Quizy 100%: <b style="color:var(--yellow)">${q.perfects || 0}</b></div>
+      </div>
+      <div style="max-height:55vh;overflow:auto">
+        <table class="atable" style="width:100%">
+          <thead><tr><th>Gra</th><th>Rozegrane</th><th>Rekord</th></tr></thead>
+          <tbody>${rows}</tbody>
+        </table>
+      </div>
+      <p class="micro muted" style="margin-top:10px">Poprawne odpowiedzi w quizach łącznie: <b>${q.correct || 0}</b>. Statystyki zapisują się w tej przeglądarce.</p>`,
+      { title: '📊 Moje statystyki' });
+  };
+  Ach.badge();
+  Ach.evaluate();
 })();

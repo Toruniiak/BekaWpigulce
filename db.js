@@ -284,18 +284,42 @@ const DB = (() => {
     remove(id) { state.videos = state.videos.filter(v => v.id !== id); save(); }
   };
 
+  /* Katalog gier scalany W LOCIE ze stanem: dzięki temu nowe gry pojawiają
+     się też u osób, które mają już zapisany starszy stan w localStorage.
+     Stan przechowuje tylko flagę enabled (wyłączenia z panelu są szanowane). */
+  const GAME_CATALOG = [
+    { id: 'game_bloki', code: 'bloki', name: 'Bloki 10×10', description: 'Układaj klocki na planszy 10×10 i czyść linie. Serie dają bonusy — jak długo przetrwasz?', category: 'logiczne' },
+    { id: 'game_2048', code: 'g2048', name: '2048', description: 'Przesuwaj i łącz kafelki, aż zbudujesz 2048. Prosta zasada, trudny mistrz.', category: 'logiczne' },
+    { id: 'game_labirynt', code: 'labirynt', name: 'Labirynt', description: '12 poziomów do odblokowania. Znajdź wyjście jak najszybciej — czasy się zapisują!', category: 'logiczne' },
+    { id: 'game_simon', code: 'simon', name: 'Powtórz sekwencję', description: 'Zapamiętaj i powtórz coraz dłuższą sekwencję świateł. Ile rund wytrzyma Twój mózg?', category: 'pamięć' }
+  ];
   const games = {
-    all: () => state.games.slice(),
-    enabled: () => state.games.filter(g => g.enabled),
-    toggle(id) { const g = state.games.find(x => x.id === id); if (g) { g.enabled = !g.enabled; save(); } },
+    all() {
+      const byCode = {};
+      (state.games || []).forEach(g => { byCode[g.code] = { ...g }; });
+      GAME_CATALOG.forEach(g => {
+        if (byCode[g.code]) { byCode[g.code] = { ...g, enabled: byCode[g.code].enabled }; }
+        else byCode[g.code] = { ...g, enabled: true };
+      });
+      return Object.values(byCode);
+    },
+    enabled: () => games.all().filter(g => g.enabled),
+    toggle(id) {
+      let g = state.games.find(x => x.id === id);
+      if (!g) { const c = GAME_CATALOG.find(x => x.id === id); if (c) { g = { ...c, enabled: true }; state.games.push(g); } }
+      if (g) { g.enabled = !g.enabled; save(); }
+    },
     add({ name, description, category, code }) { const g = { id: uid('game'), name, description, category, code: code || 'lap', enabled: true }; state.games.push(g); save(); return g; },
     remove(id) { state.games = state.games.filter(g => g.id !== id); save(); }
   };
 
+  /* Quizy: bazowe ze stanu + paczka rozszerzona z quizy-plus.js (30 quizów).
+     Scalanie w locie — bez ruszania zapisanego stanu użytkowników. */
+  const extraQuizzes = () => (typeof window !== 'undefined' && window.__BWP_QUIZZES_EXTRA__) || [];
   const quizzes = {
-    all: () => state.quizzes.slice(),
+    all: () => state.quizzes.concat(extraQuizzes().filter(q => !state.quizzes.some(s => s.id === q.id))),
     main: () => state.quizzes[0],
-    byId: (id) => state.quizzes.find(q => q.id === id),
+    byId: (id) => quizzes.all().find(q => q.id === id),
     add(title) { const q = { id: uid('quiz'), title: title || 'Nowy quiz', desc: '', questions: [] }; state.quizzes.push(q); save(); return q; },
     update(id, data) { const i = state.quizzes.findIndex(q => q.id === id); if (i >= 0) { state.quizzes[i] = { ...state.quizzes[i], ...data }; save(); } },
     remove(id) { state.quizzes = state.quizzes.filter(q => q.id !== id); save(); }

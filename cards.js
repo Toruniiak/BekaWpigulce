@@ -131,6 +131,7 @@ const Cards = (() => {
         const txt = body.querySelector('#cmtBody').value.trim();
         if (txt.length < 2) return UI.toast('Komentarz za krótki', 'err');
         const user = await UI.requireUser();
+        try { localStorage.setItem('bwp_commented', '1'); } catch (e) {}
         DB.comments.add(memeId, txt, user.name);
         body.innerHTML = render();   // przerysuj listę
         bindSend();                  // podepnij przycisk ponownie

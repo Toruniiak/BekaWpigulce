@@ -100,6 +100,7 @@
     $('#memCap').value = $('#memTags').value = $('#memUrl').value = '';
     uploadedDataUrl = ''; preview.style.display = 'none';
     $('#pendingCount').textContent = DB.memes.pending().length;
+    try { localStorage.setItem('bwp_submitted', '1'); } catch (e) {}
     UI.toast('Mem wysłany do moderacji! 🎉 Po akceptacji pojawi się w katalogu.', 'ok', 3600);
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
@@ -164,6 +165,7 @@
       });
       UI.closeModal();
       $('#pendingCount').textContent = DB.memes.pending().length;
+      try { localStorage.setItem('bwp_submitted', '1'); } catch (e) {}
       UI.toast('Mem z kreatora wysłany do poczekalni! 🎉', 'ok', 3200);
       render();
     };
