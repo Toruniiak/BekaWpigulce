@@ -134,8 +134,14 @@ const UI = (() => {
       if (ad && ad.active && ad.html.trim()) {
         const inner = ad.link ? `<a href="${ad.link}" target="_blank" rel="noopener">${ad.html}</a>` : ad.html;
         box.innerHTML = `<div class="ad ad--live">${inner}</div>`;
+        box.style.display = '';
       } else {
-        box.innerHTML = `<div class="ad ad--empty"><span>Reklama — ${labels[slot] || slot}</span><small>miejsce konfigurowane w panelu</small></div>`;
+        /* Brak aktywnej reklamy = slot całkowicie znika ze strony.
+           Żadnych ramek-placeholderów — recenzent AdSense nie może widzieć
+           pustych miejsc "na reklamy". Po aktywowaniu reklamy w panelu
+           slot pojawia się z powrotem automatycznie. */
+        box.innerHTML = '';
+        box.style.display = 'none';
       }
     });
   }
