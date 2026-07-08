@@ -35,34 +35,32 @@
 
 <main class="wrap">
 
-  <!-- OSTATNI POST Z FACEBOOKA + zapis -->
-  <section class="block" id="fb">
+  <!-- OD CZEGO ZACZĄĆ -->
+  <section class="block" id="start">
     <div class="sec-head">
-      <h2 class="sec-h">Prosto z <span class="ac">Facebooka</span></h2>
-      <a class="sec-link" id="fbLink" target="_blank" rel="noopener">Otwórz profil →</a>
+      <h2 class="sec-h">Od czego <span class="ac">zacząć?</span></h2>
+      <span class="muted micro">Jedno kliknięcie</span>
     </div>
-    <div class="split">
-      <div class="card card--pad0" style="padding:12px;display:flex;justify-content:center;min-width:0;overflow:hidden">
-        <!-- Oficjalna wtyczka FB: data-adapt-container-width sprawia, że plugin
-             zwęża się do szerokości kontenera (naprawia rozjeżdżanie na telefonie) -->
-        <div style="width:100%;max-width:500px;min-width:0">
-          <div class="fb-page"
-               data-tabs="timeline" data-width="500" data-height="480"
-               data-adapt-container-width="true"
-               data-small-header="true" data-hide-cover="true"
-               data-show-facepile="false" id="fbPlugin">
-          </div>
-        </div>
-      </div>
-      <div class="card">
-        <span class="eyebrow">Dołącz do ekipy</span>
-        <h3 class="card-h">Obserwuj na Facebooku</h3>
-        <p class="muted" style="margin-bottom:14px">Codzienna dawka beki, zagadki i konkursy prosto na Twoją tablicę. Zero spamu.</p>
-        <a class="btn btn--block btn--fb" id="fbFollow" target="_blank" rel="noopener">Obserwuj BekaWpigułce 🔥</a>
-        <div style="margin-top:18px"><div data-ad="sidebar"></div></div>
-      </div>
+    <div class="grid grid-4">
+      <a class="card center" href="memy.html" style="text-decoration:none;padding:22px 12px">
+        <div style="font-size:2rem">😂</div><b style="margin:6px 0 2px">Memy</b>
+        <span class="muted micro">przeglądaj, głosuj, wrzucaj własne</span>
+      </a>
+      <a class="card center" href="rozrywka.html" style="text-decoration:none;padding:22px 12px">
+        <div style="font-size:2rem">🎮</div><b style="margin:6px 0 2px">Gry i quizy</b>
+        <span class="muted micro">10 gier, 39 quizów, osiągnięcia</span>
+      </a>
+      <a class="card center" href="odpowiedzi.html" style="text-decoration:none;padding:22px 12px">
+        <div style="font-size:2rem">🕵️</div><b style="margin:6px 0 2px">Zagadki</b>
+        <span class="muted micro">łamigłówki + odpowiedzi z wyjaśnieniem</span>
+      </a>
+      <a class="card center" href="filmy.html" style="text-decoration:none;padding:22px 12px">
+        <div style="font-size:2rem">🎬</div><b style="margin:6px 0 2px">Filmy</b>
+        <span class="muted micro">klasyki polskiego internetu</span>
+      </a>
     </div>
   </section>
+
 
   <!-- POLECANE -->
   <section class="block" id="featured">
@@ -125,6 +123,34 @@
     <span class="eyebrow">Jak dziś czujesz bekę?</span>
     <h2 class="sec-h" style="margin-bottom:18px">Kliknij reakcję</h2>
     <div class="reacts" id="reacts" style="justify-content:center"></div>
+  </section>
+
+  <section class="block" id="fb">
+    <div class="sec-head">
+      <h2 class="sec-h">Prosto z <span class="ac">Facebooka</span></h2>
+      <a class="sec-link" id="fbLink" target="_blank" rel="noopener">Otwórz profil →</a>
+    </div>
+    <div class="split">
+      <div class="card card--pad0" style="padding:12px;display:flex;justify-content:center;min-width:0;overflow:hidden">
+        <!-- Oficjalna wtyczka FB: data-adapt-container-width sprawia, że plugin
+             zwęża się do szerokości kontenera (naprawia rozjeżdżanie na telefonie) -->
+        <div style="width:100%;max-width:500px;min-width:0">
+          <div class="fb-page"
+               data-tabs="timeline" data-width="500" data-height="480"
+               data-adapt-container-width="true"
+               data-small-header="true" data-hide-cover="true"
+               data-show-facepile="false" id="fbPlugin">
+          </div>
+        </div>
+      </div>
+      <div class="card">
+        <span class="eyebrow">Dołącz do ekipy</span>
+        <h3 class="card-h">Obserwuj na Facebooku</h3>
+        <p class="muted" style="margin-bottom:14px">Codzienna dawka beki, zagadki i konkursy prosto na Twoją tablicę. Zero spamu.</p>
+        <a class="btn btn--block btn--fb" id="fbFollow" target="_blank" rel="noopener">Obserwuj BekaWpigułce 🔥</a>
+        <div style="margin-top:18px"><div data-ad="sidebar"></div></div>
+      </div>
+    </div>
   </section>
 
 </main>

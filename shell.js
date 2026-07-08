@@ -23,7 +23,7 @@ const UI = (() => {
   const NAV = [
     { key: 'home', label: 'Start', href: 'index.html' },
     { key: 'memy', label: 'Memy', href: 'memy.html' },
-    { key: 'odpowiedzi', label: 'Odpowiedzi', href: 'odpowiedzi.html' },
+    { key: 'odpowiedzi', label: 'Zagadki', href: 'odpowiedzi.html' },
     { key: 'rozrywka', label: 'Rozrywka', href: 'rozrywka.html' },
     { key: 'filmy', label: 'Filmy', href: 'filmy.html' }
   ];

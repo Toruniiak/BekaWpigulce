@@ -8,11 +8,11 @@
    ========================================================================== */
 window.__BWP_CONTENT__ = {
   "version": 3,
-  "published_at": "2026-07-08T06:00:00.000Z",
+  "published_at": "2026-07-08T09:00:00.000Z",
   "memes": [
     {
       "id": "mem_seed_01",
-      "image": "img/memy/mem01.jpg",
+      "image": "https://image.pollinations.ai/prompt/young%20man%20in%20socks%20sitting%20on%20couch%20scrolling%20phone%2C%20hallway%20with%20shoes%20ready%20in%20background%2C%20candid%20photorealistic%20photo%2C%20natural%20window%20light%2C%2035mm%2C%20no%20text?width=832&height=1040&seed=101&nologo=true&model=flux",
       "caption": "Kiedy mówisz „już wychodzę”, a siedzisz w skarpetkach",
       "author": "BekaWpigułce",
       "category": "zycie",
@@ -24,11 +24,12 @@ window.__BWP_CONTENT__ = {
       "status": "approved",
       "votes_up": 268,
       "votes_down": 11,
-      "featured": true
+      "featured": true,
+      "fallback": "img/memy/mem01.jpg"
     },
     {
       "id": "mem_seed_02",
-      "image": "img/memy/mem02.jpg",
+      "image": "https://image.pollinations.ai/prompt/exhausted%20office%20worker%20at%20messy%20desk%20late%20evening%2C%20monitors%20glowing%2C%20head%20in%20hands%2C%20photorealistic%20candid%20office%20photo%2C%20no%20text?width=832&height=1040&seed=102&nologo=true&model=flux",
       "caption": "Szef: „to zajmie 5 minut”",
       "author": "BekaWpigułce",
       "category": "praca",
@@ -40,11 +41,12 @@ window.__BWP_CONTENT__ = {
       "status": "approved",
       "votes_up": 197,
       "votes_down": 8,
-      "featured": true
+      "featured": true,
+      "fallback": "img/memy/mem02.jpg"
     },
     {
       "id": "mem_seed_03",
-      "image": "img/memy/mem03.jpg",
+      "image": "https://image.pollinations.ai/prompt/hand%20slamming%20alarm%20clock%20at%206am%2C%20dark%20bedroom%2C%20person%20hiding%20under%20blanket%2C%20photorealistic%2C%20moody%20morning%20light%2C%20no%20text?width=832&height=1040&seed=103&nologo=true&model=flux",
       "caption": "Jutro wstaję o 6 i zmieniam życie",
       "author": "BekaWpigułce",
       "category": "zycie",
@@ -56,11 +58,12 @@ window.__BWP_CONTENT__ = {
       "status": "approved",
       "votes_up": 55,
       "votes_down": 8,
-      "featured": false
+      "featured": false,
+      "fallback": "img/memy/mem03.jpg"
     },
     {
       "id": "mem_seed_04",
-      "image": "img/memy/mem04.jpg",
+      "image": "https://image.pollinations.ai/prompt/polish%20home%20kitchen%2C%20steaming%20pot%20on%20stove%2C%20mother%20stirring%20soup%2C%20warm%20light%2C%20photorealistic%20candid%20family%20photo%2C%20no%20text?width=832&height=1040&seed=104&nologo=true&model=flux",
       "caption": "Mama: „obiad za 5 minut!”",
       "author": "BekaWpigułce",
       "category": "rodzina",
@@ -72,11 +75,12 @@ window.__BWP_CONTENT__ = {
       "status": "approved",
       "votes_up": 238,
       "votes_down": 3,
-      "featured": true
+      "featured": true,
+      "fallback": "img/memy/mem04.jpg"
     },
     {
       "id": "mem_seed_05",
-      "image": "img/memy/mem05.jpg",
+      "image": "https://image.pollinations.ai/prompt/man%20running%20through%20apartment%20hallway%20holding%20jeans%2C%20delivery%20box%20visible%20through%20door%20peephole%20perspective%2C%20photorealistic%20candid%2C%20motion%20blur%2C%20no%20text?width=832&height=1040&seed=105&nologo=true&model=flux",
       "caption": "Kurier: „będę za 10 minut”",
       "author": "BekaWpigułce",
       "category": "zycie",
@@ -88,11 +92,12 @@ window.__BWP_CONTENT__ = {
       "status": "approved",
       "votes_up": 305,
       "votes_down": 11,
-      "featured": false
+      "featured": false,
+      "fallback": "img/memy/mem05.jpg"
     },
     {
       "id": "mem_seed_06",
-      "image": "img/memy/mem06.jpg",
+      "image": "https://image.pollinations.ai/prompt/empty%20open%20wallet%20held%20upside%20down%2C%20single%20coin%20falling%20out%2C%20shallow%20depth%20of%20field%2C%20photorealistic%20close-up%20photo%2C%20no%20text?width=832&height=1040&seed=106&nologo=true&model=flux",
       "caption": "Konto 3 dni po wypłacie",
       "author": "BekaWpigułce",
       "category": "zycie",
@@ -104,11 +109,12 @@ window.__BWP_CONTENT__ = {
       "status": "approved",
       "votes_up": 91,
       "votes_down": 1,
-      "featured": true
+      "featured": true,
+      "fallback": "img/memy/mem06.jpg"
     },
     {
       "id": "mem_seed_07",
-      "image": "img/memy/mem07.jpg",
+      "image": "https://image.pollinations.ai/prompt/shopping%20cart%20overflowing%20with%20groceries%20in%20discount%20supermarket%20aisle%2C%20yellow%20price%20tags%2C%20photorealistic%20candid%20photo%2C%20no%20text?width=832&height=1040&seed=107&nologo=true&model=flux",
       "caption": "Kupię tylko chleb…",
       "author": "BekaWpigułce",
       "category": "zycie",
@@ -120,11 +126,12 @@ window.__BWP_CONTENT__ = {
       "status": "approved",
       "votes_up": 272,
       "votes_down": 1,
-      "featured": false
+      "featured": false,
+      "fallback": "img/memy/mem07.jpg"
     },
     {
       "id": "mem_seed_08",
-      "image": "img/memy/mem08.jpg",
+      "image": "https://image.pollinations.ai/prompt/office%20meeting%20room%2C%20employees%20all%20looking%20down%20at%20laptops%20avoiding%20eye%20contact%2C%20one%20empty%20chair%2C%20photorealistic%20corporate%20photo%2C%20no%20text?width=832&height=1040&seed=108&nologo=true&model=flux",
       "caption": "Kto chce dodatkowe zadanie?",
       "author": "BekaWpigułce",
       "category": "praca",
@@ -136,11 +143,12 @@ window.__BWP_CONTENT__ = {
       "status": "approved",
       "votes_up": 127,
       "votes_down": 5,
-      "featured": false
+      "featured": false,
+      "fallback": "img/memy/mem08.jpg"
     },
     {
       "id": "mem_seed_09",
-      "image": "img/memy/mem09.jpg",
+      "image": "https://image.pollinations.ai/prompt/frustrated%20man%20staring%20at%20wifi%20router%20with%20blinking%20lights%2C%20dark%20living%20room%20lit%20by%20tv%20static%2C%20photorealistic%2C%20no%20text?width=832&height=1040&seed=109&nologo=true&model=flux",
       "caption": "Internet 600 Mb/s vs internet podczas meczu",
       "author": "BekaWpigułce",
       "category": "internet",
@@ -152,11 +160,12 @@ window.__BWP_CONTENT__ = {
       "status": "approved",
       "votes_up": 51,
       "votes_down": 6,
-      "featured": false
+      "featured": false,
+      "fallback": "img/memy/mem09.jpg"
     },
     {
       "id": "mem_seed_10",
-      "image": "img/memy/mem10.jpg",
+      "image": "https://image.pollinations.ai/prompt/grandmother%20in%20floral%20apron%20serving%20huge%20plate%20of%20pierogi%20to%20young%20man%20at%20kitchen%20table%2C%20warm%20cozy%20light%2C%20photorealistic%20candid%2C%20no%20text?width=832&height=1040&seed=110&nologo=true&model=flux",
       "caption": "Babcia: „zjedz coś, taki chudy jesteś”",
       "author": "BekaWpigułce",
       "category": "rodzina",
@@ -168,11 +177,12 @@ window.__BWP_CONTENT__ = {
       "status": "approved",
       "votes_up": 161,
       "votes_down": 8,
-      "featured": true
+      "featured": true,
+      "fallback": "img/memy/mem10.jpg"
     },
     {
       "id": "mem_seed_11",
-      "image": "img/memy/mem11.jpg",
+      "image": "https://image.pollinations.ai/prompt/smartphone%20lying%20face%20down%20on%20tiled%20floor%2C%20worried%20hands%20reaching%20for%20it%2C%20dramatic%20lighting%2C%20photorealistic%20close-up%2C%20no%20text?width=832&height=1040&seed=111&nologo=true&model=flux",
       "caption": "Telefon spada ekranem w dół",
       "author": "BekaWpigułce",
       "category": "internet",
@@ -184,11 +194,12 @@ window.__BWP_CONTENT__ = {
       "status": "approved",
       "votes_up": 293,
       "votes_down": 5,
-      "featured": false
+      "featured": false,
+      "fallback": "img/memy/mem11.jpg"
     },
     {
       "id": "mem_seed_12",
-      "image": "img/memy/mem12.jpg",
+      "image": "https://image.pollinations.ai/prompt/donut%20with%20sprinkles%20next%20to%20open%20gym%20bag%20and%20untouched%20dumbbells%2C%20kitchen%20counter%2C%20photorealistic%20still%20life%20photo%2C%20no%20text?width=832&height=1040&seed=112&nologo=true&model=flux",
       "caption": "Dieta od poniedziałku",
       "author": "BekaWpigułce",
       "category": "zycie",
@@ -200,11 +211,12 @@ window.__BWP_CONTENT__ = {
       "status": "approved",
       "votes_up": 285,
       "votes_down": 2,
-      "featured": false
+      "featured": false,
+      "fallback": "img/memy/mem12.jpg"
     },
     {
       "id": "mem_seed_13",
-      "image": "img/memy/mem13.jpg",
+      "image": "https://image.pollinations.ai/prompt/smartphone%20screen%20glowing%20at%20night%20showing%20many%20notification%20badges%2C%20tired%20eyes%20reflection%2C%20photorealistic%20macro%20photo%2C%20no%20text?width=832&height=1040&seed=113&nologo=true&model=flux",
       "caption": "94 nowe wiadomości na grupie",
       "author": "BekaWpigułce",
       "category": "internet",
@@ -216,11 +228,12 @@ window.__BWP_CONTENT__ = {
       "status": "approved",
       "votes_up": 253,
       "votes_down": 3,
-      "featured": false
+      "featured": false,
+      "fallback": "img/memy/mem13.jpg"
     },
     {
       "id": "mem_seed_14",
-      "image": "img/memy/mem14.jpg",
+      "image": "https://image.pollinations.ai/prompt/young%20man%20looking%20uncertain%20in%20barber%20chair%2C%20barber%20holding%20mirror%20behind%20his%20head%2C%20barbershop%20interior%2C%20photorealistic%20candid%2C%20no%20text?width=832&height=1040&seed=114&nologo=true&model=flux",
       "caption": "Fryzjer: „może być?”",
       "author": "BekaWpigułce",
       "category": "zycie",
@@ -232,11 +245,12 @@ window.__BWP_CONTENT__ = {
       "status": "approved",
       "votes_up": 314,
       "votes_down": 2,
-      "featured": false
+      "featured": false,
+      "fallback": "img/memy/mem14.jpg"
     },
     {
       "id": "mem_seed_15",
-      "image": "img/memy/mem15.jpg",
+      "image": "https://image.pollinations.ai/prompt/middle%20aged%20man%20searching%20through%20drawers%2C%20eyeglasses%20sitting%20on%20top%20of%20his%20head%2C%20cluttered%20living%20room%2C%20photorealistic%20candid%2C%20funny%2C%20no%20text?width=832&height=1040&seed=115&nologo=true&model=flux",
       "caption": "Tata szuka okularów",
       "author": "BekaWpigułce",
       "category": "rodzina",
@@ -248,11 +262,12 @@ window.__BWP_CONTENT__ = {
       "status": "approved",
       "votes_up": 304,
       "votes_down": 3,
-      "featured": false
+      "featured": false,
+      "fallback": "img/memy/mem15.jpg"
     },
     {
       "id": "mem_seed_16",
-      "image": "img/memy/mem16.jpg",
+      "image": "https://image.pollinations.ai/prompt/person%20lying%20on%20bed%20holding%20phone%20above%20face%2C%20cozy%20blanket%2C%20dim%20evening%20room%2C%20photorealistic%20candid%20photo%2C%20no%20text?width=832&height=1040&seed=116&nologo=true&model=flux",
       "caption": "Przerwa od telefonu",
       "author": "BekaWpigułce",
       "category": "internet",
@@ -264,11 +279,12 @@ window.__BWP_CONTENT__ = {
       "status": "approved",
       "votes_up": 60,
       "votes_down": 0,
-      "featured": false
+      "featured": false,
+      "fallback": "img/memy/mem16.jpg"
     },
     {
       "id": "mem_seed_17",
-      "image": "img/memy/mem17.jpg",
+      "image": "https://image.pollinations.ai/prompt/city%20bus%20arriving%20at%20empty%20bus%20stop%2C%20surprised%20pedestrian%20checking%20watch%2C%20morning%20street%2C%20photorealistic%20candid%2C%20no%20text?width=832&height=1040&seed=117&nologo=true&model=flux",
       "caption": "Autobus przyjechał punktualnie",
       "author": "BekaWpigułce",
       "category": "zycie",
@@ -280,11 +296,12 @@ window.__BWP_CONTENT__ = {
       "status": "approved",
       "votes_up": 258,
       "votes_down": 10,
-      "featured": false
+      "featured": false,
+      "fallback": "img/memy/mem17.jpg"
     },
     {
       "id": "mem_seed_18",
-      "image": "img/memy/mem18.jpg",
+      "image": "https://image.pollinations.ai/prompt/long%20boring%20corporate%20meeting%2C%20clock%20on%20wall%2C%20employees%20yawning%20around%20table%20with%20laptops%2C%20photorealistic%20office%20photo%2C%20no%20text?width=832&height=1040&seed=118&nologo=true&model=flux",
       "caption": "Zebranie, które mogło być mailem",
       "author": "BekaWpigułce",
       "category": "praca",
@@ -296,11 +313,12 @@ window.__BWP_CONTENT__ = {
       "status": "approved",
       "votes_up": 177,
       "votes_down": 1,
-      "featured": true
+      "featured": true,
+      "fallback": "img/memy/mem18.jpg"
     },
     {
       "id": "mem_seed_19",
-      "image": "img/memy/mem19.jpg",
+      "image": "https://image.pollinations.ai/prompt/person%20wide%20awake%20in%20bed%20at%20night%20staring%20at%20ceiling%2C%20moonlight%20through%20window%2C%20photorealistic%20moody%20photo%2C%20no%20text?width=832&height=1040&seed=119&nologo=true&model=flux",
       "caption": "Idę spać wcześniej",
       "author": "BekaWpigułce",
       "category": "zycie",
@@ -312,11 +330,12 @@ window.__BWP_CONTENT__ = {
       "status": "approved",
       "votes_up": 211,
       "votes_down": 3,
-      "featured": false
+      "featured": false,
+      "fallback": "img/memy/mem19.jpg"
     },
     {
       "id": "mem_seed_20",
-      "image": "img/memy/mem20.jpg",
+      "image": "https://image.pollinations.ai/prompt/man%20standing%20in%20front%20of%20open%20refrigerator%20at%20night%2C%20fridge%20light%20illuminating%20face%2C%20almost%20empty%20shelves%2C%20photorealistic%20candid%2C%20no%20text?width=832&height=1040&seed=120&nologo=true&model=flux",
       "caption": "Lodówka co 20 minut",
       "author": "BekaWpigułce",
       "category": "zycie",
@@ -328,11 +347,12 @@ window.__BWP_CONTENT__ = {
       "status": "approved",
       "votes_up": 197,
       "votes_down": 9,
-      "featured": false
+      "featured": false,
+      "fallback": "img/memy/mem20.jpg"
     },
     {
       "id": "mem_seed_21",
-      "image": "img/memy/mem21.jpg",
+      "image": "https://image.pollinations.ai/prompt/wedding%20reception%20table%2C%20young%20man%20intensely%20focused%20on%20eating%20salad%20while%20relatives%20lean%20in%20talking%2C%20photorealistic%20candid%2C%20funny%2C%20no%20text?width=832&height=1040&seed=121&nologo=true&model=flux",
       "caption": "Ciocia na weselu: „a dziewczyna jest?”",
       "author": "BekaWpigułce",
       "category": "rodzina",
@@ -344,11 +364,12 @@ window.__BWP_CONTENT__ = {
       "status": "approved",
       "votes_up": 253,
       "votes_down": 11,
-      "featured": false
+      "featured": false,
+      "fallback": "img/memy/mem21.jpg"
     },
     {
       "id": "mem_seed_22",
-      "image": "img/memy/mem22.jpg",
+      "image": "https://image.pollinations.ai/prompt/completely%20emotionless%20face%20lit%20by%20phone%20screen%20in%20dark%20room%2C%20deadpan%20expression%2C%20photorealistic%20portrait%2C%20no%20text?width=832&height=1040&seed=122&nologo=true&model=flux",
       "caption": "Kiedy piszesz „hahaha”",
       "author": "BekaWpigułce",
       "category": "internet",
@@ -360,11 +381,12 @@ window.__BWP_CONTENT__ = {
       "status": "approved",
       "votes_up": 215,
       "votes_down": 3,
-      "featured": false
+      "featured": false,
+      "fallback": "img/memy/mem22.jpg"
     },
     {
       "id": "mem_seed_23",
-      "image": "img/memy/mem23.jpg",
+      "image": "https://image.pollinations.ai/prompt/people%20crowding%20into%20small%20shadow%20of%20one%20tree%20during%20heatwave%2C%20bright%20summer%20street%2C%20photorealistic%20candid%2C%20funny%2C%20no%20text?width=832&height=1040&seed=123&nologo=true&model=flux",
       "caption": "30 stopni. Polacy: „w cieniu się nie liczy”",
       "author": "BekaWpigułce",
       "category": "zycie",
@@ -376,11 +398,12 @@ window.__BWP_CONTENT__ = {
       "status": "approved",
       "votes_up": 200,
       "votes_down": 2,
-      "featured": false
+      "featured": false,
+      "fallback": "img/memy/mem23.jpg"
     },
     {
       "id": "mem_seed_24",
-      "image": "img/memy/mem24.jpg",
+      "image": "https://image.pollinations.ai/prompt/family%20members%20walking%20out%20of%20their%20rooms%20into%20hallway%20looking%20confused%2C%20router%20with%20no%20lights%20in%20foreground%2C%20photorealistic%20candid%2C%20no%20text?width=832&height=1040&seed=124&nologo=true&model=flux",
       "caption": "Wi-Fi padło na 30 sekund",
       "author": "BekaWpigułce",
       "category": "rodzina",
@@ -392,7 +415,8 @@ window.__BWP_CONTENT__ = {
       "status": "approved",
       "votes_up": 44,
       "votes_down": 0,
-      "featured": false
+      "featured": false,
+      "fallback": "img/memy/mem24.jpg"
     }
   ],
   "videos": [

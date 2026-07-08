@@ -24,29 +24,30 @@
 
 <main class="wrap" style="padding-top:22px">
 
-  <!-- pasek narzędzi: szukaj + kategorie + sort -->
+  <!-- 1) Gdzie jesteś: katalog czy poczekalnia -->
+  <div class="chips-row" style="margin-bottom:10px">
+    <button class="fchip on" id="tabMain">📚 Katalog</button>
+    <button class="fchip" id="tabPending">⏳ Poczekalnia <span id="tabPendingCount"></span></button>
+    <span style="flex:1"></span>
+    <a href="#dodaj" class="btn btn--sm">+ Wrzuć mema</a>
+    <button class="btn btn--ghost btn--sm" id="openCreator">🎨 Kreator</button>
+    <button class="btn btn--ghost btn--sm" id="openProfile">👤 Profil</button>
+  </div>
+  <p class="muted micro" id="pendingInfo" style="display:none;margin-bottom:10px">
+    Świeże zgłoszenia od użytkowników — jeszcze przed moderacją. Głosuj 🔥, najlepsze wpadają na stronę!
+  </p>
+
+  <!-- 2) Zawężanie: kategoria + szukajka + sortowanie -->
   <div class="toolbar">
-    <div class="search">🔎<input id="q" placeholder="Szukaj mema lub tagu…"></div>
     <div class="chips-row" id="cats"></div>
+    <div class="search">🔎<input id="q" placeholder="Szukaj mema lub tagu…"></div>
     <select class="sel" id="sort">
       <option value="new">Najnowsze</option>
       <option value="top">Najgorętsze 🔥</option>
       <option value="discussed">Najbardziej komentowane</option>
       <option value="controversial">Kontrowersyjne 💩</option>
     </select>
-    <a href="#dodaj" class="btn btn--sm">+ Wrzuć mema</a>
-    <button class="btn btn--ghost btn--sm" id="openCreator">🎨 Kreator mema</button>
-    <button class="btn btn--ghost btn--sm" id="openProfile">👤 Mój profil</button>
   </div>
-
-  <!-- zakładki: katalog / poczekalnia (jak na demotywatorach) -->
-  <div class="chips-row" style="margin:4px 0 10px">
-    <button class="fchip on" id="tabMain">📚 Katalog</button>
-    <button class="fchip" id="tabPending">⏳ Poczekalnia <span id="tabPendingCount"></span></button>
-  </div>
-  <p class="muted micro" id="pendingInfo" style="display:none;margin-bottom:10px">
-    Świeże zgłoszenia od użytkowników — jeszcze przed moderacją. Głosuj 🔥, najlepsze wpadają na stronę!
-  </p>
 
   <p class="muted micro" id="resultInfo" style="margin-bottom:14px"></p>
 

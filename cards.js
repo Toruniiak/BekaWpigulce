@@ -42,7 +42,7 @@ const Cards = (() => {
       <div class="meme-imgwrap">
         ${rankBadge}
         <span class="pill pill--y meme-cat">${e(DB.categories.name(m.category))}</span>
-        <img src="${m.image}" alt="${e(m.caption)}" loading="lazy">
+        <img src="${m.image}" alt="${e(m.caption)}" loading="lazy"${m.fallback ? ` onerror="this.onerror=null;this.src='${m.fallback}'"` : ''}>
       </div>
       <div class="meme-body">
         <p class="meme-cap">${e(m.caption)}</p>
@@ -119,7 +119,7 @@ const Cards = (() => {
         </div>`;
       }).join('') : `<p class="muted center" style="padding:18px 0">Brak komentarzy. Bądź pierwszy 👀</p>`;
       return `
-        <img src="${m.image}" alt="" style="width:100%;max-height:260px;object-fit:cover;border-radius:12px;margin-bottom:6px">
+        <img src="${m.image}" alt="" style="width:100%;max-height:260px;object-fit:cover;border-radius:12px;margin-bottom:6px"${m.fallback ? ` onerror="this.onerror=null;this.src='${m.fallback}'"` : ''}>
         <p class="meme-cap" style="margin-bottom:14px">${e(m.caption)}</p>
         <div id="cmtList" style="max-height:280px;overflow:auto">${items}</div>
         <div class="field" style="margin-top:14px"><textarea id="cmtBody" placeholder="Dorzuć coś od siebie…" maxlength="400"></textarea></div>

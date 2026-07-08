@@ -211,7 +211,7 @@
         const repBadge = reps.length ? `<div style="margin-top:4px"><span class="pill pill--r">🚩 ${reps.length} zgł.</span>
           <button class="btn btn--ghost btn--sm" data-act="repclear" title="${reps.map(r => DB.util.esc(r.reason)).join(', ')}">wyczyść</button></div>` : '';
         return `<tr data-id="${m.id}" ${reps.length ? 'style="background:#241416"' : ''}>
-          <td><img class="thumb" src="${m.image}" alt=""></td>
+          <td><img class="thumb" src="${m.image}" alt=""${m.fallback ? ` onerror="this.onerror=null;this.src='${m.fallback}'"` : ''}></td>
           <td>${esc(m.caption || '—')}<div class="micro muted">${esc(m.author)}</div>${repBadge}</td>
           <td>${st}</td>
           <td><b style="color:var(--yellow)">${DB.memes.score(m)}</b><div class="micro muted">+${m.votes_up}/-${m.votes_down}</div></td>
