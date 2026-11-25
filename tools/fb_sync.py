@@ -40,7 +40,7 @@ GRAPH = "https://graph.facebook.com"
 VERSION = os.getenv("FB_GRAPH_VERSION", "v26.0")
 UA = {"User-Agent": "BekaWpigulceSiteSync/1.0"}
 MAX_IMG_W = 1080
-DEFAULT_PAGE_ID = "1282869891751446"  # BekaWpigułce (ID publiczne)
+DEFAULT_PAGE_ID = "1282869891751448"  # BekaWpigułce (ID publiczne)
 
 POST_FIELDS = (
     "id,created_time,message,permalink_url,full_picture,status_type,"
