@@ -37,7 +37,7 @@ ROOT = Path(__file__).resolve().parents[1]
 OUT_JS = ROOT / "fb-content.js"
 IMG_DIR = ROOT / "img" / "fb"
 GRAPH = "https://graph.facebook.com"
-VERSION = os.getenv("FB_GRAPH_VERSION", "v27.0")
+VERSION = os.getenv("FB_GRAPH_VERSION", "v26.0")
 UA = {"User-Agent": "BekaWpigulceSiteSync/1.0"}
 MAX_IMG_W = 1080
 
