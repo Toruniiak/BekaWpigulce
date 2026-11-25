@@ -111,7 +111,10 @@ def _token_expiry(token: str) -> str:
     """Data wygaśnięcia sekretu (debug_token działa z tokenem dewelopera aplikacji)."""
     try:
         d = _get(f"{GRAPH}/{VERSION}/debug_token?" + urllib.parse.urlencode({"input_token": token, "access_token": token}))
-        exp = int((d.get("data") or {}).get("expires_at") or 0)
+        info = d.get("data") or {}
+        # expires_at = sam token; data_access_expires_at = co ~90 dni Meta wymaga ponownej zgody
+        exps = [int(info.get(k) or 0) for k in ("expires_at", "data_access_expires_at")]
+        exp = min((e for e in exps if e), default=0)
     except (GraphError, ValueError):
         return "nieznana"
     if not exp:
@@ -362,8 +365,12 @@ def build(raw: dict) -> dict:
     else:
         # Okno pobrania: wszystko nowsze niż najstarszy pobrany post zastępujemy świeżymi danymi
         # (posty usunięte na FB w tym oknie znikają ze strony), starsze zostają bez zmian.
-        oldest = min((p["created_at"] for p in fresh), default=None)
-        merged = {k: v for k, v in existing.items() if oldest is None or v["created_at"] < oldest}
+        # Okno liczymy TYLKO z /posts (rolki z /video_reels sięgają dalej wstecz i zaniżałyby okno).
+        post_ids = {str(p.get("id")) for p in raw.get("posts", [])}
+        oldest = min((p["created_at"] for p in fresh if p["id"] in post_ids), default=None)
+        fresh_ids = {p["id"] for p in fresh}
+        merged = {k: v for k, v in existing.items()
+                  if k not in fresh_ids and (oldest is None or v["created_at"] < oldest or v.get("reel"))}
 
     for p in fresh:
         old = existing.get(p["id"]) or {}
