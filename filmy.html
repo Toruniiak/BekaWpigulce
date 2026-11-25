@@ -72,7 +72,7 @@
 
 <!-- Kolejność ładowania: dane → powłoka (nawigacja/stopka) → karty → logika strony -->
 <script src="content.js"></script>
-<script src="fb-content.js"></script>
+<script>/* posty z FB: świeża wersja co 2 min (omija cache przeglądarki) */document.write('<script src="fb-content.js?v='+Math.floor(Date.now()/120000)+'"><\/script>');</script>
 <script src="db.js"></script>
 <script src="shell.js"></script>
 <script src="cards.js"></script>

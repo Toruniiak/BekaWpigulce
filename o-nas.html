@@ -30,7 +30,7 @@
   </div>
 </main>
 <script src="content.js"></script>
-<script src="fb-content.js"></script>
+<script>/* posty z FB: świeża wersja co 2 min (omija cache przeglądarki) */document.write('<script src="fb-content.js?v='+Math.floor(Date.now()/120000)+'"><\/script>');</script>
 <script src="db.js"></script>
 <script src="shell.js"></script>
 <script>document.addEventListener("DOMContentLoaded",()=>{var f=DB.settings.get();document.querySelectorAll("[data-fb]").forEach(a=>a.href=f.fb_page_url);document.querySelectorAll("[data-tt]").forEach(a=>a.href=f.tiktok_url);});</script>
