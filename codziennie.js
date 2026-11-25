@@ -56,7 +56,9 @@
 
   const done = ls.get('bwp_daily_done', {});
   if (done.day !== today) { done.day = today; done.items = {}; }
+  if (window.Rank) Rank.award('visit');
   const mark = (k) => {
+    if (window.Rank) Rank.award('task', k);
     if (done.items[k]) return;
     done.items[k] = 1; ls.set('bwp_daily_done', done);
     const n = Object.keys(done.items).length;
@@ -79,7 +81,7 @@
     { d: 'Pon', n: 'Zagadkowy poniedziałek', i: '🧩', href: 'odpowiedzi.html' },
     { d: 'Wt', n: 'Quizowy wtorek', i: '🧠', href: 'rozrywka.html#quizy' },
     { d: 'Śr', n: 'Środa z PRL-em', i: '📻', href: 'memy.html?cat=nostalgia' },
-    { d: 'Czw', n: 'Turniej gry tygodnia', i: '🏆', href: 'rozrywka.html?gra=' + (pick(games, 9) || {}).code },
+    { d: 'Czw', n: 'Turniej gry tygodnia', i: '🏆', href: 'ranking.html' },
     { d: 'Pt', n: 'Piątkowe rolki', i: '🎬', href: 'filmy.html' },
     { d: 'Sob', n: 'Sobotni top memów', i: '🔥', href: 'memy.html?sort=top' },
     { d: 'Nd', n: 'Niedziela z rodziną', i: '👨‍👩‍👧', href: 'memy.html?cat=rodzina' }
@@ -146,4 +148,25 @@
     if (s === 0) setTimeout(() => location.reload(), 1500);
   };
   tick(); setInterval(tick, 1000);
+
+  /* ---- mini-ranking tygodnia + zaproszenie do rywalizacji ------------- */
+  if (window.Rank && Rank.ready) {
+    const box = document.createElement('div');
+    box.className = 'home-rank';
+    host.appendChild(box);
+    const g = Rank.gameOfWeek();
+    Promise.all([Rank.leaderboard('week', 5), Rank.whenReady]).then(([top]) => {
+      const me = Rank.profile;
+      box.innerHTML = `
+        <div class="sec-head" style="margin-bottom:10px"><h3 class="card-h">🏆 Top 5 tygodnia</h3>
+          <a class="sec-link" href="ranking.html">Pełny ranking →</a></div>
+        <ol class="rk-list">${top.length ? top.map(r => `<li class="rk-row${me && r.nick === me.nick ? ' is-me' : ''}">
+          <span class="rk-pos">${r.pos === 1 ? '🥇' : r.pos === 2 ? '🥈' : r.pos === 3 ? '🥉' : r.pos}</span>
+          <span class="rk-av">${e(r.avatar)}</span><span class="rk-nick">${e(r.nick)}</span><b class="rk-pts">${r.pts} pkt</b></li>`).join('')
+          : '<li class="rk-empty muted">Ranking dopiero rusza — zgarnij pierwsze miejsce! 🚀</li>'}</ol>
+        <p class="muted micro" style="margin-top:8px">Turniej tygodnia: <b>${e(g.name)}</b>. Punkty za wizyty, zadania dnia, quizy i gry.</p>
+        ${me ? '' : '<button class="btn btn--sm" id="homeJoin" style="margin-top:8px">Załóż konto i walcz o Mistrza tygodnia</button>'}`;
+      const j = box.querySelector('#homeJoin'); if (j) j.onclick = () => Rank.openAuth('register');
+    });
+  }
 })();

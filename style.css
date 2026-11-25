@@ -535,3 +535,23 @@ select.sel{background:var(--surface-2);border:1px solid var(--line-2);color:var(
   .week-day .wn{display:none}
 }
 .daily-streak b{white-space:nowrap}
+
+/* ===== RANKINGI (25.11.2026) ===== */
+.rk-list{list-style:none;padding:0;margin:0;display:flex;flex-direction:column;gap:6px}
+.rk-row{display:grid;grid-template-columns:40px 30px 1fr auto;align-items:center;gap:8px;background:#161616;
+  border:1px solid #262626;border-radius:12px;padding:9px 12px}
+.rk-row.is-me{border-color:var(--yellow);background:#1d1a0c}
+.rk-pos{font-weight:800;text-align:center}
+.rk-av{font-size:1.2rem;text-align:center}
+.rk-av.big{font-size:2rem}
+.rk-nick{font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.rk-pts{color:var(--yellow);white-space:nowrap}
+.rk-empty{padding:14px;text-align:center}
+.rk-me{background:#161616;border:1px solid #262626;border-left:4px solid var(--yellow);border-radius:var(--r);padding:16px 18px}
+.rk-me-h{display:flex;gap:12px;align-items:center;margin-bottom:12px}
+.rk-me-h div{display:flex;flex-direction:column}
+.rk-me-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.rk-podium{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:10px;text-align:center}
+.rk-podium div{display:flex;flex-direction:column;gap:2px;background:#161616;border:1px solid #262626;border-radius:12px;padding:10px 6px}
+.rk-podium span:first-child{font-size:1.6rem}
+.home-rank{margin-top:14px}

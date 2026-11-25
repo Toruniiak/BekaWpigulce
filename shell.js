@@ -25,7 +25,8 @@ const UI = (() => {
     { key: 'memy', label: 'Memy', href: 'memy.html' },
     { key: 'odpowiedzi', label: 'Zagadki', href: 'odpowiedzi.html' },
     { key: 'rozrywka', label: 'Rozrywka', href: 'rozrywka.html' },
-    { key: 'filmy', label: 'Filmy', href: 'filmy.html' }
+    { key: 'filmy', label: 'Filmy', href: 'filmy.html' },
+    { key: 'ranking', label: 'Ranking 🏆', href: 'ranking.html' }
   ];
 
   /* ====================== POWIADOMIENIA (TOAST) ========================= */
@@ -70,6 +71,7 @@ const UI = (() => {
      (Logowanie przez FB jest dostępne, gdy w ustawieniach jest fb_app_id.) */
   function requireUser() {
     return new Promise(resolve => {
+      if (window.Rank && Rank.profile) return resolve({ name: Rank.profile.nick, avatar: Rank.profile.avatar });
       const u = DB.users.current();
       if (u) return resolve(u);
       const body = modal(`

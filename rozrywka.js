@@ -13,8 +13,8 @@
     key: c => 'bwp_game_' + c,
     get(c) { try { return JSON.parse(localStorage.getItem(Stats.key(c))) || {}; } catch (err) { return {}; } },
     save(c, o) { try { localStorage.setItem(Stats.key(c), JSON.stringify(o)); } catch (err) {} },
-    play(c) { const s = Stats.get(c); s.plays = (s.plays || 0) + 1; Stats.save(c, s); Ach.later(); return s; },
-    max(c, f, v) { const s = Stats.get(c); let nr = false; if (v > (s[f] || 0)) { s[f] = v; nr = true; } Stats.save(c, s); Ach.later(); return nr; },
+    play(c) { const s = Stats.get(c); s.plays = (s.plays || 0) + 1; Stats.save(c, s); Ach.later(); if (c !== 'quiz' && window.Rank) Rank.award('game', c); return s; },
+    max(c, f, v) { const s = Stats.get(c); let nr = false; if (v > (s[f] || 0)) { s[f] = v; nr = true; } Stats.save(c, s); Ach.later(); if (f === 'best' && window.Rank) Rank.submitScore(c, v); return nr; },
     min(c, f, v) { const s = Stats.get(c); let nr = false; if (s[f] == null || v < s[f]) { s[f] = v; nr = true; } Stats.save(c, s); Ach.later(); return nr; },
     add(c, f, d) { const s = Stats.get(c); s[f] = (s[f] || 0) + d; Stats.save(c, s); Ach.later(); return s[f]; },
     flag(c, f) { const s = Stats.get(c); if (!s[f]) { s[f] = 1; Stats.save(c, s); Ach.later(); } }
@@ -929,6 +929,7 @@
     function finish() {
       const pct = Math.round(score / questions.length * 100);
       Stats.play('quiz'); Stats.add('quiz', 'correct', score);
+      if (window.Rank) Rank.award('quiz', q.id, score);
       if (pct === 100) Stats.add('quiz', 'perfects', 1);
       const verdict = pct === 100 ? 'Mistrz! 👑' : pct >= 60 ? 'Nieźle 😎' : pct >= 40 ? 'Może być 🙂' : 'Douczysz się 😅';
       body.innerHTML = `<div class="quiz-final"><b>${score}/${questions.length}</b><p class="muted" style="margin:10px 0">${verdict} (${pct}%)</p><button class="btn" id="qAgain">Zagraj jeszcze raz</button></div>`;

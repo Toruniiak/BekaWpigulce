@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ranking i rywalizacja — BekaWpigułce 🏆</title>
+<meta name="description" content="Ranking graczy BekaWpigułce: zbieraj punkty za codzienne wizyty, zadania dnia, quizy i gry. Turniej gry tygodnia i Mistrz tygodnia.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:ital,wght@0,600;0,800;0,900;1,900&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="icon" href="favicon.ico" sizes="any">
+<link rel="icon" type="image/png" href="img/brand/favicon-32.png">
+<link rel="apple-touch-icon" href="img/brand/apple-touch-icon.png">
+<meta name="theme-color" content="#0E0E0E">
+<meta property="og:site_name" content="BekaWpigułce">
+<meta property="og:image" content="https://bekawpigulce.pl/img/brand/og-image.png">
+<link rel="stylesheet" href="style.css?v=20261125e">
+</head>
+<body data-page="ranking">
+
+<header class="wrap" style="padding-top:34px;max-width:760px">
+  <span class="eyebrow">Rywalizacja</span>
+  <h1 style="font-family:var(--disp);font-weight:900;font-size:clamp(2rem,6vw,3.2rem);letter-spacing:-.02em">
+    Ranking <span style="color:var(--yellow)">BekaWpigułce</span> 🏆
+  </h1>
+  <p class="muted" style="max-width:60ch;margin-top:8px">Zbieraj punkty za codzienne wizyty, zadania dnia, quizy i gry. Co tydzień nowy turniej i nowy Mistrz tygodnia.</p>
+</header>
+
+<main class="wrap" style="padding-top:22px;max-width:760px">
+  <section class="block" id="rkMe"></section>
+  <section class="block" id="rkChamps" hidden></section>
+
+  <section class="block">
+    <div class="sec-head"><h2 class="sec-h">Tabela <span class="ac">punktów</span></h2></div>
+    <div class="chips-row" id="rkTabs" style="margin-bottom:14px">
+      <button class="fchip" data-p="day">Dziś</button>
+      <button class="fchip on" data-p="week">Ten tydzień</button>
+      <button class="fchip" data-p="month">Ten miesiąc</button>
+      <button class="fchip" data-p="all">Wszech czasów</button>
+    </div>
+    <ol class="rk-list" id="rkList"></ol>
+  </section>
+
+  <section class="block" id="rkTourney"></section>
+
+  <section class="block">
+    <div class="card">
+      <span class="eyebrow">Jak zdobywać punkty</span>
+      <ul class="welcome-list">
+        <li>📅 <b>+10</b> za wizytę na stronie — raz dziennie</li>
+        <li>✅ <b>+5</b> za każde z 4 zadań dnia (zagadka, quiz, gra, rolka)</li>
+        <li>🎮 <b>+5</b> za zagranie w każdą grę — raz dziennie na grę</li>
+        <li>🧠 <b>+1</b> za każdą poprawną odpowiedź w quizie (raz dziennie na quiz)</li>
+        <li>🏆 Turniej tygodnia: liczy się Twój najlepszy wynik w grze tygodnia — co poniedziałek nowa gra</li>
+      </ul>
+      <p class="micro muted" style="margin-top:10px">Punkty liczy serwer według stałych zasad. Tydzień trwa od poniedziałku do niedzieli (czas polski).</p>
+    </div>
+  </section>
+</main>
+
+<script src="content.js?v=20261125e"></script>
+<script>document.write('<script src="fb-content.js?v='+Math.floor(Date.now()/120000)+'"><\/script>');</script>
+<script src="db.js?v=20261125e"></script>
+<script src="shell.js?v=20261125e"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
+<script src="supabase-config.js?v=20261125e"></script>
+<script src="ranking.js?v=20261125e"></script>
+<script src="ranking-page.js?v=20261125e"></script>
+</body>
+</html>
