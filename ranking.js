@@ -151,3 +151,5 @@ const Rank = (() => {
     onChange: fn => listeners.push(fn), get profile() { return profile; }, whenReady, SCORE_GAMES, GAME_NAMES, esc
   };
 })();
+
+window.Rank = Rank; // globalny dostęp dla gier, zadań dnia i powłoki (window.Rank)

@@ -176,6 +176,10 @@ language sql stable security definer set search_path = public as $$
 $$;
 
 -- ---------------------------------------------------------------- uprawnienia
+-- Tabele: tylko odczyt profili (nick, avatar) i zmiana własnego avatara. Punkty/wyniki — wyłącznie przez funkcje.
+revoke all on public.profiles, public.points, public.game_scores from anon, authenticated;
+grant select (id, nick, avatar, created_at) on public.profiles to anon, authenticated;
+grant update (avatar) on public.profiles to authenticated;
 revoke all on function public.award(text, text, int) from public, anon;
 revoke all on function public.submit_score(text, int) from public, anon;
 revoke all on function public.my_stats() from public, anon;
