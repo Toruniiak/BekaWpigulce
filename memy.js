@@ -15,8 +15,9 @@
   /* --- przyciski kategorii --- */
   const cats = $('#cats');
   const catList = [{ slug: 'all', name: 'Wszystko' }, ...DB.categories.all()];
+  if (params.get('cat') && catList.some(c => c.slug === params.get('cat'))) activeCat = params.get('cat'); // np. ?cat=nostalgia
   cats.innerHTML = catList.map(c =>
-    `<button class="fchip ${c.slug === 'all' ? 'on' : ''}" data-c="${c.slug}">${DB.util.esc(c.name)}</button>`).join('');
+    `<button class="fchip ${c.slug === activeCat ? 'on' : ''}" data-c="${c.slug}">${DB.util.esc(c.name)}</button>`).join('');
   cats.querySelectorAll('.fchip').forEach(b => b.onclick = () => {
     cats.querySelectorAll('.fchip').forEach(x => x.classList.remove('on'));
     b.classList.add('on'); activeCat = b.dataset.c; render();

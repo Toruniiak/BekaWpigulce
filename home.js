@@ -9,6 +9,34 @@
   const s = DB.settings.get();
   const hide = sel => { const el = $(sel); if (el) el.hidden = true; };
 
+  /* --- Powitanie / zaproszenie (można zwinąć; pamiętane w przeglądarce) --- */
+  (function welcome() {
+    const box = $('#welcome'); if (!box) return;
+    let closed = false; try { closed = localStorage.getItem('bwp_welcome_closed') === '1'; } catch (x) {}
+    if (closed) { box.hidden = true; return; }
+    const memes = DB.memes.approved().length, vids = DB.videos.all().length;
+    const riddles = DB.memes.approved().filter(m => m.category === 'zagadki').length;
+    const games = DB.games.enabled().length, quizzes = DB.quizzes.all().length;
+    box.innerHTML = `
+      <article class="welcome-card">
+        <button class="icon-btn welcome-x" aria-label="Zwiń powitanie" title="Zwiń">✕</button>
+        <span class="eyebrow">👋 Witaj na BekaWpigułce</span>
+        <h2 class="sec-h" style="margin:6px 0 10px">Cała beka z naszego Facebooka w jednym miejscu</h2>
+        <p class="muted">Wszystko, co wrzucamy na Facebooka, ląduje tu automatycznie kilkanaście minut po publikacji. Bez algorytmu, który chowa posty, bez szukania po tablicy.</p>
+        <ul class="welcome-list">
+          <li>😂 <b>${memes}</b> memów i grafik, posegregowanych w kategorie (PRL, auta, rodzina, praca…)</li>
+          <li>🎬 <b>${vids}</b> rolek i filmów do obejrzenia od ręki</li>
+          <li>🧩 <b>${riddles}</b> zagadek, a do tego <b>${quizzes}</b> quizów i <b>${games}</b> gier z rekordami i osiągnięciami</li>
+          <li>🔥 Codziennie nowe zadania: zagadka, quiz, gra i rolka dnia. Wracaj i nie przerywaj serii!</li>
+        </ul>
+        <div class="row" style="gap:10px;flex-wrap:wrap;margin-top:14px">
+          <a class="btn" href="#daily">Zobacz zadania na dziś</a>
+          <a class="btn btn--ghost" href="${DB.util.esc(s.fb_page_url)}" target="_blank" rel="noopener">Obserwuj na Facebooku</a>
+        </div>
+      </article>`;
+    box.querySelector('.welcome-x').onclick = () => { box.hidden = true; try { localStorage.setItem('bwp_welcome_closed', '1'); } catch (x) {} };
+  })();
+
   /* --- Licznik fanów: fb-stats.js (aktualizowany automatycznie z Facebooka) --- */
   function fansLabel() {
     const n = (window.__BWP_STATS__ || {}).followers;

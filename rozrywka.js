@@ -58,8 +58,13 @@
     { id: 'fav_5', icon: '⭐', name: 'Kolekcjoner beki', desc: 'Dodaj 5 memów do ulubionych', cond: () => DB.favorites.count() >= 5 },
     { id: 'voter_10', icon: '🗳️', name: 'Głos ludu', desc: 'Oddaj 10 głosów na memy', cond: () => { try { return Object.keys(JSON.parse(localStorage.getItem('bwp_votes') || '{}')).length >= 10; } catch (e) { return false; } } },
     { id: 'author', icon: '📤', name: 'Twórca', desc: 'Wyślij swojego mema', cond: () => !!localStorage.getItem('bwp_submitted') },
-    { id: 'commenter', icon: '💬', name: 'Komentator', desc: 'Napisz komentarz', cond: () => !!localStorage.getItem('bwp_commented') }
+    { id: 'commenter', icon: '💬', name: 'Komentator', desc: 'Napisz komentarz', cond: () => !!localStorage.getItem('bwp_commented') },
+    { id: 'streak_3', icon: '🔥', name: 'Rozgrzewka', desc: 'Wpadnij 3 dni z rzędu', cond: () => streakBest() >= 3 },
+    { id: 'streak_7', icon: '📅', name: 'Tydzień beki', desc: 'Wpadnij 7 dni z rzędu', cond: () => streakBest() >= 7 },
+    { id: 'streak_30', icon: '👑', name: 'Stały bywalec', desc: 'Wpadnij 30 dni z rzędu', cond: () => streakBest() >= 30 },
+    { id: 'daily_full', icon: '✅', name: 'Dzień zaliczony', desc: 'Zrób wszystkie 4 zadania dnia', cond: () => { try { return (+localStorage.getItem('bwp_full_days') || 0) >= 1; } catch (e) { return false; } } }
   ];
+  function streakBest() { try { return (JSON.parse(localStorage.getItem('bwp_streak')) || {}).best || 0; } catch (e) { return 0; } }
   const Ach = {
     key: 'bwp_ach',
     got() { try { return JSON.parse(localStorage.getItem(Ach.key)) || {}; } catch (e) { return {}; } },
@@ -125,6 +130,13 @@
     c.onclick = () => launchQuiz(qz.id);
     qg.appendChild(c);
   });
+
+  /* --- link bezpośredni z „Dziś na BekaWpigułce": rozrywka.html?gra=snake / ?quiz=quiz_logika --- */
+  (() => {
+    const p = new URLSearchParams(location.search), g = p.get('gra'), q = p.get('quiz');
+    if (g && LAUNCHERS[g]) setTimeout(() => LAUNCHERS[g](), 300);
+    else if (q && DB.quizzes.byId(q)) setTimeout(() => launchQuiz(q), 300);
+  })();
 
   /* --- wyzwania --- */
   const cg = $('#challengesGrid');

@@ -22,7 +22,7 @@
 <meta property="og:url" content="https://bekawpigulce.pl/">
 <meta property="og:type" content="website">
 <meta property="og:image" content="https://bekawpigulce.pl/img/brand/og-image.png">
-<link rel="stylesheet" href="style.css?v=20261125c">
+<link rel="stylesheet" href="style.css?v=20261125d">
 </head>
 <body data-page="home">
 
@@ -47,6 +47,12 @@
 <main class="wrap">
 
   <!-- OD CZEGO ZACZĄĆ -->
+  <!-- POWITANIE / ZAPROSZENIE -->
+  <section class="block" id="welcome"></section>
+
+  <!-- DZIŚ NA BEKAWPIGUŁCE (codziennie.js) -->
+  <section class="block" id="daily"></section>
+
   <section class="block" id="start">
     <div class="sec-head">
       <h2 class="sec-h">Od czego <span class="ac">zacząć?</span></h2>
@@ -167,12 +173,14 @@
 </main>
 
 <!-- skrypty: najpierw dane, potem powłoka, na końcu logika strony -->
-<script src="content.js?v=20261125c"></script>
+<script src="content.js?v=20261125d"></script>
 <script>/* posty z FB: świeża wersja co 2 min (omija cache przeglądarki) */document.write('<script src="fb-content.js?v='+Math.floor(Date.now()/120000)+'"><\/script>');</script>
 <script>document.write('<script src="fb-stats.js?v='+Math.floor(Date.now()/120000)+'"><\/script>');</script>
-<script src="db.js?v=20261125c"></script>
-<script src="shell.js?v=20261125c"></script>
-<script src="cards.js?v=20261125c"></script>
-<script src="home.js?v=20261125c"></script>
+<script src="quizy-plus.js?v=20261125d"></script>
+<script src="db.js?v=20261125d"></script>
+<script src="shell.js?v=20261125d"></script>
+<script src="cards.js?v=20261125d"></script>
+<script src="home.js?v=20261125d"></script>
+<script src="codziennie.js?v=20261125d"></script>
 </body>
 </html>
