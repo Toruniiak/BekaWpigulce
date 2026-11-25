@@ -51,3 +51,16 @@ W panelu admina: **Pulpit** pokazuje liczbę postów z FB i czas ostatniej synch
   „Pobierz posty z Facebooka”. „Brak FB_PAGE_TOKEN” = nie dodano sekretu;
   „Graph API HTTP 190” = token wygasł/unieważniony (np. zmiana hasła FB) — powtórz punkt 1–2.
 - Ręcznie lokalnie: `FB_PAGE_TOKEN=... python tools/fb_sync.py [--full]`.
+
+## Co strona pomija i narzędzia (od 25.11.2026)
+
+- **Posty o samej stronie** (podsumowania tygodnia, „Witam nowych obserwatorów”, podziękowania, odznaki,
+  prośby o subskrypcję) nie trafiają na stronę — wzorce w `tools/fb_sync.py` (`META_PATTERNS`).
+- **Duplikaty**: identyczny tekst → zostaje post z największym zaangażowaniem. Ręczna lista ukrytych:
+  `tools/fb_exclude.json` (27 duplikatów; zostaje wersja z największym zasięgiem).
+- **Licznik obserwujących**: `fb-stats.js`, odświeżany przez synchronizację.
+- **Actions → „Statystyki postów z Facebooka”**: zasięg/reakcje wybranych postów (nic nie zmienia).
+- **Actions → „Ukryj posty na Facebooku”**: ukrywa posty z osi czasu strony (NIGDY nie usuwa).
+  Wybierz `unhide`, żeby przywrócić. Puste pole ID = lista z `tools/fb_exclude.json`.
+  Potrzebuje sekretu `FB_ADMIN_TOKEN` (token z uprawnieniem `pages_manage_posts`; krótkotrwały — przy
+  kolejnym użyciu wygeneruj nowy w eksploratorze Graph API i podmień sekret).
