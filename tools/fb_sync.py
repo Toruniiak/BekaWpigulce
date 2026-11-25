@@ -81,11 +81,34 @@ def _paginate(path: str, params: dict, token: str, max_pages: int) -> list[dict]
     return out
 
 
+def _page_token_from_user(token: str, want_id: str) -> tuple[str, str, str] | None:
+    """Gdy sekret to token UŻYTKOWNIKA: znajdź stronę BekaWpigułce w /me/accounts i weź jej token."""
+    try:
+        accts = _paginate("me/accounts", {"fields": "id,name,access_token", "limit": 100}, token, 5)
+    except GraphError:
+        return None  # token strony nie ma /accounts — to dobrze
+    if not accts:
+        return None
+    pick = next((a for a in accts if want_id and str(a.get("id")) == want_id), None) \
+        or next((a for a in accts if "bekawpigu" in _fold(a.get("name", "")).replace(" ", "")), None) \
+        or (accts[0] if len(accts) == 1 else None)
+    if not pick or not pick.get("access_token"):
+        names = ", ".join(a.get("name", "?") for a in accts)
+        raise GraphError(f"Token użytkownika nie wskazuje strony BekaWpigułce (strony: {names}). Ustaw zmienną FB_PAGE_ID.")
+    return pick["access_token"], str(pick["id"]), pick.get("name", "?")
+
+
 def fetch_raw(page_id: str, token: str, full: bool) -> dict:
-    # Z tokenem strony „me" oznacza samą stronę — ID nie jest wtedy wymagane.
-    me = _get(f"{GRAPH}/{VERSION}/{page_id or 'me'}?{urllib.parse.urlencode({'fields': 'id,name', 'access_token': token})}")
-    page_id = str(me.get("id") or page_id)
-    print(f"Strona: {me.get('name', '?')} ({page_id})")
+    page = _page_token_from_user(token, page_id)
+    if page:
+        token, page_id, name = page
+        print(f"::warning::Sekret FB_PAGE_TOKEN to token UŻYTKOWNIKA — działa, ale wygaśnie za ok. 60 dni. "
+              f"Wklej token STRONY (FACEBOOK-SYNC.md), żeby synchronizacja działała bez końca.")
+    else:
+        # Z tokenem strony „me" oznacza samą stronę — ID nie jest wtedy wymagane.
+        me = _get(f"{GRAPH}/{VERSION}/{page_id or 'me'}?{urllib.parse.urlencode({'fields': 'id,name', 'access_token': token})}")
+        page_id, name = str(me.get("id") or page_id), me.get("name", "?")
+    print(f"Strona: {name} ({page_id})")
     posts = _paginate(f"{page_id}/posts", {"fields": POST_FIELDS, "limit": 50}, token, 200 if full else 1)
     try:
         reels = _paginate(f"{page_id}/video_reels", {"fields": REEL_FIELDS, "limit": 25}, token, 100 if full else 1)
