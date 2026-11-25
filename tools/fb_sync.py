@@ -107,11 +107,28 @@ def _page_token_from_user(token: str, want_id: str) -> tuple[str, str, str] | No
     return pick["access_token"], str(pick["id"]), pick.get("name", "?")
 
 
+def _token_expiry(token: str) -> str:
+    """Data wygaśnięcia sekretu (debug_token działa z tokenem dewelopera aplikacji)."""
+    try:
+        d = _get(f"{GRAPH}/{VERSION}/debug_token?" + urllib.parse.urlencode({"input_token": token, "access_token": token}))
+        exp = int((d.get("data") or {}).get("expires_at") or 0)
+    except (GraphError, ValueError):
+        return "nieznana"
+    if not exp:
+        return "nigdy"
+    when = datetime.fromtimestamp(exp, timezone.utc)
+    days = (when - datetime.now(timezone.utc)).total_seconds() / 86400
+    if days < 7:
+        print(f"::warning::Sekret FB_PAGE_TOKEN wygasa {when:%Y-%m-%d %H:%M} UTC — podmień go (FACEBOOK-SYNC.md).")
+    return f"{when:%Y-%m-%d %H:%M} UTC"
+
+
 def fetch_raw(page_id: str, token: str, full: bool) -> dict:
+    print(f"Ważność sekretu FB_PAGE_TOKEN: {_token_expiry(token)}")
     page = _page_token_from_user(token, page_id)
     if page:
         token, page_id, name = page
-        print(f"::warning::Sekret FB_PAGE_TOKEN to token UŻYTKOWNIKA — działa, ale wygaśnie za ok. 60 dni. "
+        print(f"::warning::Sekret FB_PAGE_TOKEN to token UŻYTKOWNIKA — działa do daty powyżej. "
               f"Wklej token STRONY (FACEBOOK-SYNC.md), żeby synchronizacja działała bez końca.")
     else:
         # Z tokenem strony „me" oznacza samą stronę — ID nie jest wtedy wymagane.
