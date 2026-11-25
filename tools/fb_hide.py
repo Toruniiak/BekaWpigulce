@@ -52,7 +52,13 @@ def main() -> int:
     ok = bad = 0
     for pid in ids:
         try:
-            r = post(pid, {"is_hidden": "true" if action == "hide" else "false", "access_token": token})
+            try:
+                r = post(pid, {"is_hidden": "true" if action == "hide" else "false", "access_token": token})
+            except fs.GraphError as e:
+                if "posted by page itself" not in str(e):
+                    raise
+                # posty samej strony: ukrycie z osi czasu strony (post zostaje na FB)
+                r = post(pid, {"timeline_visibility": "hidden" if action == "hide" else "normal", "access_token": token})
             ok += 1 if r.get("success", True) else 0
             print(f"{pid}: {'ukryty' if action == 'hide' else 'przywrócony'}")
         except fs.GraphError as e:
