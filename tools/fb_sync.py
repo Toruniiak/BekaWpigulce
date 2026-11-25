@@ -115,7 +115,13 @@ def fetch_raw(page_id: str, token: str, full: bool) -> dict:
               f"Wklej token STRONY (FACEBOOK-SYNC.md), żeby synchronizacja działała bez końca.")
     else:
         # Z tokenem strony „me" oznacza samą stronę — ID nie jest wtedy wymagane.
-        me = _get(f"{GRAPH}/{VERSION}/{page_id or 'me'}?{urllib.parse.urlencode({'fields': 'id,name', 'access_token': token})}")
+        try:  # pole „category" mają tylko strony — konto użytkownika zwróci błąd
+            me = _get(f"{GRAPH}/{VERSION}/{page_id or 'me'}?{urllib.parse.urlencode({'fields': 'id,name,category', 'access_token': token})}")
+        except GraphError as e:
+            if "category" in str(e):
+                raise GraphError("FB_PAGE_TOKEN to token UŻYTKOWNIKA bez dostępu do strony BekaWpigułce. "
+                                 "Wygeneruj token STRONY (FACEBOOK-SYNC.md) i podmień sekret.") from None
+            raise
         page_id, name = str(me.get("id") or page_id), me.get("name", "?")
     print(f"Strona: {name} ({page_id})")
     posts = _paginate(f"{page_id}/posts", {"fields": POST_FIELDS, "limit": 50}, token, 200 if full else 1)
@@ -328,7 +334,11 @@ def load_existing() -> dict:
 
 def build(raw: dict) -> dict:
     fresh = normalize(raw)
-    existing = {p["id"]: p for p in (load_existing().get("posts") or [])}
+    prev = load_existing()
+    existing = {p["id"]: p for p in (prev.get("posts") or [])}
+    if not fresh and existing:
+        print("[uwaga] Facebook zwrócił 0 postów — zostawiam obecną treść bez zmian.", file=sys.stderr)
+        return prev
 
     if raw.get("full"):
         merged: dict[str, dict] = {}
@@ -373,6 +383,8 @@ def build(raw: dict) -> dict:
         "categories": cats,
         "posts": posts,
     }
+    if prev.get("posts") == posts and str(prev.get("page_id")) == str(data["page_id"]):
+        return data  # bez zmian — nie nadpisujemy pliku (brak pustych commitów co 10 minut)
     body = json.dumps(data, ensure_ascii=False, separators=(",", ":"))
     OUT_JS.write_text(
         "/* BekaWpigułce — treść z Facebooka. Plik generuje tools/fb_sync.py (GitHub Actions).\n"

@@ -1,3 +1,3 @@
 /* BekaWpigułce — treść z Facebooka. Plik generuje tools/fb_sync.py (GitHub Actions).
    NIE edytuj ręcznie — zmiany zostaną nadpisane przy następnej synchronizacji. */
-window.__BWP_FB__ = {"version":1,"synced_at":"2026-11-25T03:00:33Z","page_id":"29410104365322650","categories":[{"slug":"zagadki","name":"Zagadki"},{"slug":"nostalgia","name":"Nostalgia i PRL"},{"slug":"auto","name":"Auta i drogi"},{"slug":"zwierzeta","name":"Zwierzaki"},{"slug":"rodzina","name":"Rodzina"},{"slug":"praca","name":"Praca i szef"},{"slug":"internet","name":"Internet i technologia"},{"slug":"zycie","name":"Życie codzienne"}],"posts":[]};
+window.__BWP_FB__ = {"version":1,"synced_at":"","page_id":"","categories":[],"posts":[]};
