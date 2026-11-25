@@ -40,6 +40,7 @@ GRAPH = "https://graph.facebook.com"
 VERSION = os.getenv("FB_GRAPH_VERSION", "v26.0")
 UA = {"User-Agent": "BekaWpigulceSiteSync/1.0"}
 MAX_IMG_W = 1080
+DEFAULT_PAGE_ID = "1282869891751446"  # BekaWpigułce (ID publiczne)
 
 POST_FIELDS = (
     "id,created_time,message,permalink_url,full_picture,status_type,"
@@ -88,7 +89,15 @@ def _page_token_from_user(token: str, want_id: str) -> tuple[str, str, str] | No
     except GraphError:
         return None  # token strony nie ma /accounts — to dobrze
     if not accts:
-        return None
+        # Strony w „nowym doświadczeniu" często nie pojawiają się w /me/accounts —
+        # wtedy prosimy o token bezpośrednio z ID strony.
+        try:
+            p = _get(f"{GRAPH}/{VERSION}/{want_id or DEFAULT_PAGE_ID}?"
+                     + urllib.parse.urlencode({"fields": "id,name,access_token", "access_token": token}))
+        except GraphError as e:
+            print(f"[uwaga] token strony z ID: {e}", file=sys.stderr)
+            return None
+        return (p["access_token"], str(p["id"]), p.get("name", "?")) if p.get("access_token") else None
     pick = next((a for a in accts if want_id and str(a.get("id")) == want_id), None) \
         or next((a for a in accts if "bekawpigu" in _fold(a.get("name", "")).replace(" ", "")), None) \
         or (accts[0] if len(accts) == 1 else None)
