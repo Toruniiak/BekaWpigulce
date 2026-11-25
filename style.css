@@ -482,3 +482,17 @@ select.sel{background:var(--surface-2);border:1px solid var(--line-2);color:var(
   .brand-logo{width:32px;height:32px}
   .nav-right{gap:6px}
 }
+
+/* ===== FEED: post pod postem, mniejsze karty, jeden kolor (25.11.2026) ===== */
+.meme-grid,#filmGrid,#videoGrid,.ans-grid{display:flex !important;flex-direction:column;gap:16px;
+  max-width:520px;margin-left:auto;margin-right:auto;width:100%}
+.meme,.film,.ans-card{background:#161616 !important;border:1px solid #262626 !important}
+.meme-imgwrap{aspect-ratio:auto;background:#161616;display:flex;justify-content:center}
+.meme-imgwrap img{width:100%;height:auto;max-height:420px;object-fit:contain}
+.meme-body{padding:12px 14px;gap:8px}
+.meme-cap{font-size:.95rem;font-weight:500}
+.film-body{padding:12px 14px}
+.film-thumb{max-height:300px}
+.ans-thumb img{max-height:320px;object-fit:contain;background:#161616}
+.feed-more{display:block;margin:18px auto 0}
+.feed-more[hidden]{display:none}

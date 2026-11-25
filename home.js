@@ -9,13 +9,22 @@
   const s = DB.settings.get();
   const hide = sel => { const el = $(sel); if (el) el.hidden = true; };
 
+  /* --- Licznik fanów: fb-stats.js (aktualizowany automatycznie z Facebooka) --- */
+  function fansLabel() {
+    const n = (window.__BWP_STATS__ || {}).followers;
+    if (!n) return '15 tys.+';
+    if (n >= 1e6) return (n / 1e6).toLocaleString('pl-PL', { maximumFractionDigits: 1 }) + ' mln';
+    if (n >= 1e4) return (n / 1e3).toLocaleString('pl-PL', { maximumFractionDigits: 1 }) + ' tys.';
+    return n.toLocaleString('pl-PL');
+  }
+
   /* --- Hero: liczby --- */
   const st = DB.stats();
   $('#heroStats').innerHTML = [
     [st.memes_approved, 'grafik i memów'],
     [st.votes_total.toLocaleString('pl-PL'), 'głosów'],
     [st.videos, 'rolek i filmów'],
-    ['10K+', 'fanów na FB']
+    [fansLabel(), 'obserwujących na FB']
   ].map(x => `<div class="stat"><b>${x[0]}</b><span>${x[1]}</span></div>`).join('');
 
   /* --- Facebook: link + wtyczka + przycisk „Obserwuj" --- */
@@ -25,8 +34,8 @@
   UI.loadFacebook();
 
   /* --- Polecane (chowane gdy brak) --- */
-  const feat = DB.memes.featured().slice(0, 6);
-  const featList = feat.length ? feat : DB.memes.approved().slice(0, 6);
+  const feat = DB.memes.featured().slice(0, 4);
+  const featList = feat.length ? feat : DB.memes.approved().slice(0, 4);
   if (featList.length) { const fg = $('#featuredGrid'); featList.forEach(m => fg.appendChild(Cards.meme(m))); }
   else hide('#featured');
 
@@ -72,7 +81,7 @@
   }
 
   /* --- Top memów (chowane gdy brak) --- */
-  const top = DB.memes.top(6);
+  const top = DB.memes.top(5);
   if (top.length) { const tg = $('#topGrid'); top.forEach((m, i) => tg.appendChild(Cards.meme(m, { rank: i + 1 }))); }
   else hide('#top');
 

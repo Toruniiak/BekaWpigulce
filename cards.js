@@ -213,5 +213,27 @@ const Cards = (() => {
       <p class="muted">${e(v.description || '')}</p>`, { title: '', wide: true });
   }
 
-  return { meme, video, openComments, share, playVideo, timeAgo };
+  /* ----- LISTA „POST POD POSTEM" z doładowaniem ------------------------ */
+  /* Renderuje porcjami (domyślnie 15) i dokleja przycisk „Pokaż więcej",
+     żeby długa lista postów z Facebooka nie ładowała setek obrazków naraz. */
+  function feed(host, list, make, step = 15) {
+    host.innerHTML = '';
+    const old = host.nextElementSibling;
+    if (old && old.classList.contains('feed-more')) old.remove();
+    if (!list.length) return;
+    let shown = 0;
+    const btn = document.createElement('button');
+    btn.className = 'btn btn--ghost feed-more';
+    host.after(btn);
+    const more = () => {
+      list.slice(shown, shown + step).forEach((x, i) => host.appendChild(make(x, shown + i)));
+      shown = Math.min(list.length, shown + step);
+      btn.hidden = shown >= list.length;
+      btn.textContent = `Pokaż więcej (${list.length - shown}) ↓`;
+    };
+    btn.onclick = more;
+    more();
+  }
+
+  return { meme, video, openComments, share, playVideo, timeAgo, feed };
 })();

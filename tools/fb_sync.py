@@ -35,6 +35,8 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 OUT_JS = ROOT / "fb-content.js"
+STATS_JS = ROOT / "fb-stats.js"
+EXCLUDE = ROOT / "tools" / "fb_exclude.json"
 IMG_DIR = ROOT / "img" / "fb"
 GRAPH = "https://graph.facebook.com"
 VERSION = os.getenv("FB_GRAPH_VERSION", "v26.0")
@@ -44,6 +46,7 @@ DEFAULT_PAGE_ID = "1282869891751448"  # BekaWpigułce (ID publiczne)
 
 POST_FIELDS = (
     "id,created_time,message,permalink_url,full_picture,status_type,"
+    "reactions.summary(true).limit(0),comments.summary(true).limit(0),shares,"
     "attachments{media_type,type,url,title,description,media{image{src,width,height},source},"
     "target{id,url},subattachments.limit(20){media_type,type,media{image{src,width,height}},target{id,url}}}"
 )
@@ -144,13 +147,20 @@ def fetch_raw(page_id: str, token: str, full: bool) -> dict:
             raise
         page_id, name = str(me.get("id") or page_id), me.get("name", "?")
     print(f"Strona: {name} ({page_id})")
+    try:
+        st = _get(f"{GRAPH}/{VERSION}/{page_id}?" + urllib.parse.urlencode(
+            {"fields": "followers_count,fan_count", "access_token": token}))
+    except GraphError as e:
+        print(f"[uwaga] licznik fanów: {e}", file=sys.stderr)
+        st = {}
     posts = _paginate(f"{page_id}/posts", {"fields": POST_FIELDS, "limit": 50}, token, 200 if full else 1)
     try:
         reels = _paginate(f"{page_id}/video_reels", {"fields": REEL_FIELDS, "limit": 25}, token, 100 if full else 1)
     except GraphError as e:  # brak uprawnienia do rolek nie blokuje reszty
         print(f"[uwaga] rolki: {e}", file=sys.stderr)
         reels = []
-    return {"page_id": page_id, "fetched_at": _now(), "full": full, "posts": posts, "reels": reels}
+    return {"page_id": page_id, "fetched_at": _now(), "full": full, "posts": posts, "reels": reels,
+            "followers": st.get("followers_count"), "fans": st.get("fan_count")}
 
 
 # ------------------------------------------------------------- klasyfikacja
@@ -284,6 +294,9 @@ def normalize(raw: dict) -> list[dict]:
             "url": _abs_fb(p.get("permalink_url")) or f"https://www.facebook.com/{pid}",
             "video_id": video_id,
             "length": None,
+            "score": int(((p.get("reactions") or {}).get("summary") or {}).get("total_count") or 0)
+            + int(((p.get("comments") or {}).get("summary") or {}).get("total_count") or 0)
+            + int((p.get("shares") or {}).get("count") or 0),
             "_img_src": images if kind == "photo" else ([main_src] if main_src else []),
         }
 
@@ -302,6 +315,7 @@ def normalize(raw: dict) -> list[dict]:
             "length": float(r["length"]) if r.get("length") is not None else None,
             "_img_src": [thumb] if thumb else (it or {}).get("_img_src", []),
             "reel": True,
+            "score": (it or {}).get("score", 0),
         }
         items[pid] = rec
     return list(items.values())
@@ -352,6 +366,74 @@ def load_existing() -> dict:
     return json.loads(m.group(1)) if m else {}
 
 
+# Posty „o stronie", nie treść: podsumowania tygodnia, powitania obserwatorów, podziękowania, odznaki,
+# prośby o subskrypcję. Na stronie ich nie pokazujemy (na Facebooku zostają bez zmian).
+META_PATTERNS = [
+    r"w ubieglym tygodniu moje posty", r"witam nowych obserwator", r"podziekowania dla (nowych|moich)",
+    r"dziekuje najbardziej aktywnym", r"tygodniowa liste aktywnosci", r"odznake ulubienca fanow",
+    r"liderow wsrod (moich )?fanow", r"aktywnych fanow", r"szukam [a-z ]*partnera reklamowego",
+    r"dziekujemy za \d", r"dzieki za \d+ ?(tys|k|mln|milion)", r"zasubskrybuj nasz kanal",
+    r"zostan subskrybentem", r"polubieni[ae] i bedzie nas", r"zanim zescrollujesz",
+    r"zachecam do polubienia i udostepniania strony", r"osiagnelismy \d", r"jest nas juz \d",
+]
+
+
+def is_meta(text: str) -> bool:
+    t = re.sub(r"\s+", " ", _fold(text))
+    return any(re.search(pat, t) for pat in META_PATTERNS)
+
+
+def _dedupe_key(p: dict) -> str | None:
+    t = re.sub(r"#\w+", "", _fold(p.get("text", "")))
+    t = re.sub(r"[^a-z0-9]+", " ", t).strip()
+    return f"{p['kind'] == 'video'}|{t}" if len(t) >= 20 else None
+
+
+def visible_posts(items) -> list[dict]:
+    """Bez postów-podsumowań, ręcznie wykluczonych i duplikatów (zostaje ten z największym zaangażowaniem)."""
+    try:
+        excluded = set(json.loads(EXCLUDE.read_text(encoding="utf-8")).get("ids") or [])
+    except (OSError, ValueError):
+        excluded = set()
+    best: dict[str, dict] = {}
+    out: list[dict] = []
+    for p in sorted(items, key=lambda p: p["created_at"], reverse=True):
+        if p["id"] in excluded or is_meta(p.get("text", "")):
+            continue
+        k = _dedupe_key(p)
+        if k:
+            if k in best:
+                if p.get("score", 0) > best[k].get("score", 0):
+                    out.remove(best[k])
+                    best[k] = p
+                    out.append(p)
+                continue
+            best[k] = p
+        out.append(p)
+    return sorted(out, key=lambda p: p["created_at"], reverse=True)
+
+
+def write_stats(raw: dict) -> None:
+    """fb-stats.js — liczba obserwujących; nadpisywany, gdy się zmieni (zwykle najczęściej co 30 min)."""
+    n = raw.get("followers") or raw.get("fans")
+    if not n:
+        return
+    try:
+        old = json.loads(re.search(r"=\s*(\{.*\});", STATS_JS.read_text(encoding="utf-8"), re.S).group(1))
+    except (OSError, AttributeError, ValueError):
+        old = {}
+    if old.get("followers") == n:
+        return
+    if old.get("updated_at"):
+        age = (datetime.now(timezone.utc) - datetime.strptime(old["updated_at"], "%Y-%m-%dT%H:%M:%SZ")
+               .replace(tzinfo=timezone.utc)).total_seconds()
+        if age < 1800 and abs(n - int(old.get("followers") or 0)) < 100:
+            return
+    STATS_JS.write_text(
+        "/* BekaWpigułce — liczba obserwujących na Facebooku (tools/fb_sync.py). */\n"
+        "window.__BWP_STATS__ = " + json.dumps({"followers": n, "updated_at": _now()}) + ";\n", encoding="utf-8")
+
+
 def build(raw: dict) -> dict:
     fresh = normalize(raw)
     prev = load_existing()
@@ -391,14 +473,14 @@ def build(raw: dict) -> dict:
         p["tags"] = tags_of(p["text"])
         merged[p["id"]] = p
 
-    # usuń osierocone grafiki (post skasowany na FB)
-    keep = {Path(i).name for p in merged.values() for i in p.get("images", [])}
+    posts = visible_posts(merged.values())
+    # usuń grafiki postów, których nie pokazujemy (skasowane na FB, wykluczone, duplikaty)
+    keep = {Path(i).name for p in posts for i in p.get("images", [])}
     if IMG_DIR.exists():
         for f in IMG_DIR.glob("*.jpg"):
             if f.name not in keep:
                 f.unlink()
-
-    posts = sorted(merged.values(), key=lambda p: p["created_at"], reverse=True)
+    write_stats(raw)
     cats = [{"slug": s, "name": n} for s, n, _ in CATEGORIES] + [{"slug": DEFAULT_CAT[0], "name": DEFAULT_CAT[1]}]
     data = {
         "version": 1,
@@ -409,7 +491,10 @@ def build(raw: dict) -> dict:
     }
     if prev.get("posts") == posts and str(prev.get("page_id")) == str(data["page_id"]):
         return data  # bez zmian — nie nadpisujemy pliku (brak pustych commitów co 10 minut)
-    body = json.dumps(data, ensure_ascii=False, separators=(",", ":"))
+    # jeden post na linię — małe zmiany w historii gita przy każdym nowym poście
+    head = json.dumps({k: v for k, v in data.items() if k != "posts"}, ensure_ascii=False, separators=(",", ":"))[:-1]
+    rows = ",\n".join(json.dumps(p, ensure_ascii=False, separators=(",", ":")) for p in posts)
+    body = head + ',"posts":[\n' + rows + "\n]}"
     OUT_JS.write_text(
         "/* BekaWpigułce — treść z Facebooka. Plik generuje tools/fb_sync.py (GitHub Actions).\n"
         "   NIE edytuj ręcznie — zmiany zostaną nadpisane przy następnej synchronizacji. */\n"

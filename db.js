@@ -47,7 +47,7 @@ const DB = (() => {
 
   /* Zastępcza grafika (SVG data-URI) — kafelek bez plików i internetu. */
   function placeholder(caption = 'MEM', seed = 1) {
-    const palettes = [['#1c1c1c','#FFD400'],['#1c1410','#FF3B30'],['#10171c','#FFD400'],['#161616','#34D399'],['#1a1320','#FFD400']];
+    const palettes = [['#161616','#FFD400']]; // jeden kolor dla wszystkich kafelków
     const [bg, accent] = palettes[Math.abs(seed) % palettes.length];
     const words = String(caption).toUpperCase().split(' ');
     const lines = []; let cur = '';

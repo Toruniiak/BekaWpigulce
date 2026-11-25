@@ -45,6 +45,7 @@
     grid.innerHTML = '';
 
     if (!list.length) {
+      Cards.feed(grid, [], () => null); // usuwa przycisk „Pokaż więcej"
       empty.hidden = false;     // pokaż „brak filmów"
       grid.hidden = true;
       return;
@@ -53,7 +54,7 @@
     grid.hidden = false;
 
     // Każdy film to gotowy kafelek z Cards.video (otwiera odtwarzacz w modalu)
-    list.forEach(v => grid.appendChild(Cards.video(v)));
+    Cards.feed(grid, list, v => Cards.video(v));
   }
 
   /* --- 3. Licznik i link do Facebooka ----------------------------------- */

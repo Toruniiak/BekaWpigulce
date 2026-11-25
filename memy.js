@@ -46,8 +46,8 @@
       return b.created_at.localeCompare(a.created_at); // new
     });
 
-    const grid = $('#memeGrid'); grid.innerHTML = '';
-    list.forEach((m, i) => grid.appendChild(Cards.meme(m, sort === 'top' && mode === 'main' ? { rank: i + 1 } : {})));
+    const grid = $('#memeGrid');
+    Cards.feed(grid, list, (m, i) => Cards.meme(m, sort === 'top' && mode === 'main' ? { rank: i + 1 } : {}));
     $('#emptyState').style.display = list.length ? 'none' : 'block';
     $('#resultInfo').textContent = (mode === 'pending' ? 'Poczekalnia: ' : '') +
       `Znaleziono ${list.length} ${plural(list.length)}` + (q ? ` dla „${q}"` : '');
