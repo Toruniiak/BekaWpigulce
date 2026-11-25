@@ -1,0 +1,36 @@
+# Ręcznie: ukrywa (albo przywraca) posty na osi czasu strony FB. NIGDY nie usuwa postów.
+# Bez listy ID bierze tools/fb_exclude.json (duplikaty — zostaje wersja z największym zasięgiem).
+name: Ukryj posty na Facebooku
+
+on:
+  workflow_dispatch:
+    inputs:
+      action:
+        description: "hide = ukryj, unhide = przywróć"
+        type: choice
+        options: [hide, unhide]
+        default: hide
+      ids:
+        description: "ID postów po przecinku (puste = lista z tools/fb_exclude.json)"
+        required: false
+
+permissions:
+  contents: read
+
+jobs:
+  hide:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Ukrywanie / przywracanie
+        env:
+          FB_ADMIN_TOKEN: ${{ secrets.FB_ADMIN_TOKEN }}
+          FB_PAGE_TOKEN: ${{ secrets.FB_PAGE_TOKEN }}
+          FB_PAGE_ID: ${{ vars.FB_PAGE_ID }}
+          ACTION: ${{ inputs.action }}
+          POST_IDS: ${{ inputs.ids }}
+        run: python tools/fb_hide.py
