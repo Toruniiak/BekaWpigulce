@@ -172,3 +172,17 @@ W panelu: **Narzędzia** → *Pobierz kopię (.json)* (backup), *Przywróć z pl
 - **Skarbiec** — wbudowany w panel (zakładka Skarbiec) jako pusta, prywatna kopia (noindex). Twój prywatny Skarbiec z pomysłami trzymaj u siebie.
 - **AdSense** — `ads.txt` w katalogu głównym (wpisz swój pub-ID), `robots.txt` chroni panel i Skarbiec przed indeksowaniem.
 - **Hasło panelu** — bez zmian (`beka2026`). Pamiętaj: to brama tylko po stronie przeglądarki (patrz sekcja bezpieczeństwa).
+
+---
+
+## 🏆 Konta i rankingi (Supabase, od 25.11.2026)
+
+- Projekt Supabase **bekawpigulce** (`mabcswglvlnuwqurdvia`, plan darmowy, logowanie GitHubem właściciela).
+- Schemat, zasady bezpieczeństwa i funkcje: `supabase/ranking.sql` (idempotentny — można uruchomić ponownie w SQL Editor).
+- Konfiguracja na stronie: `supabase-config.js` (URL + klucz **publikowalny** — jawny z założenia; nigdy klucz `sb_secret_`).
+- Klient: `ranking.js` (`window.Rank`), strona `ranking.html` + `ranking-page.js`, mini-ranking w `codziennie.js`.
+- Punkty liczy serwer: wizyta 10/dzień, zadanie dnia 5 (×4), gra 5/dzień/grę, quiz 1 pkt za poprawną (max 15).
+  Turniej tygodnia: najlepszy wynik w grze tygodnia (limity wiarygodności w `submit_score`).
+- Auth: e-mail + hasło, bez potwierdzania e-maila (darmowy SMTP Supabase ma bardzo niski limit wysyłek);
+  Site URL `https://bekawpigulce.pl`, przekierowania `https://bekawpigulce.pl/**`.
+- Darmowy projekt Supabase jest wstrzymywany po 7 dniach bez ruchu — przy codziennych wizytach to nie grozi.
