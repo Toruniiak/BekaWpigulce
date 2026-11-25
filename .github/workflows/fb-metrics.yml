@@ -1,0 +1,28 @@
+# Ręcznie: zasięgi i reakcje wskazanych postów (nic nie zmienia na Facebooku).
+name: Statystyki postów z Facebooka
+
+on:
+  workflow_dispatch:
+    inputs:
+      ids:
+        description: "ID postów oddzielone przecinkami"
+        required: true
+
+permissions:
+  contents: read
+
+jobs:
+  metrics:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Statystyki
+        env:
+          FB_PAGE_TOKEN: ${{ secrets.FB_PAGE_TOKEN }}
+          FB_PAGE_ID: ${{ vars.FB_PAGE_ID }}
+          POST_IDS: ${{ inputs.ids }}
+        run: python tools/fb_metrics.py
