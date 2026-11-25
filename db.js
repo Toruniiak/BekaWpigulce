@@ -6,7 +6,10 @@
    ŹRÓDŁA DANYCH (kolejność ważności):
      1. content.js  -> window.__BWP_CONTENT__  = TREŚĆ OPUBLIKOWANA dla WSZYSTKICH
         (generujesz ją w panelu: Narzędzia → „Publikuj treść", commitujesz do repo).
-     2. localStorage 'bwp_db_v3'                = Twoja lokalna kopia robocza.
+     2. localStorage 'bwp_db_v4'                = Twoja lokalna kopia robocza.
+     +  fb-content.js -> window.__BWP_FB__ = posty z Facebooka (generuje je
+        automatycznie tools/fb_sync.py w GitHub Actions) — scalane w locie
+        z memami (grafiki) i filmami (rolki/wideo).
      3. seed()                                  = pusty, czysty start.
 
    Dzięki temu: edytujesz lokalnie w panelu -> klikasz „Publikuj" -> wgrywasz
@@ -17,7 +20,19 @@
 const DB = (() => {
   'use strict';
 
-  const KEY = 'bwp_db_v3';
+  const KEY = 'bwp_db_v4';
+  /* RESET STRONY: zmiana tej daty czyści u KAŻDEGO odwiedzającego wszystkie
+     dane lokalne strony (konto/ksywa, głosy, ulubione, rekordy i osiągnięcia
+     w grach, zgłoszenia, kopia robocza panelu). Ustawione przy resecie 25.11.2026. */
+  const RESET_EPOCH = '2026-11-25';
+  (function resetIfNewEpoch() {
+    try {
+      if (localStorage.getItem('bwp_epoch') === RESET_EPOCH) return;
+      Object.keys(localStorage).forEach(k => { if (/^(bwp_|bkw_)/.test(k)) localStorage.removeItem(k); });
+      try { sessionStorage.removeItem('bwp_admin_ok'); } catch (e) {}
+      localStorage.setItem('bwp_epoch', RESET_EPOCH);
+    } catch (e) { /* localStorage zablokowany — nic do czyszczenia */ }
+  })();
   const USER_KEY = 'bwp_user';
   const VOTES_KEY = 'bwp_votes';
   const POLL_KEY = 'bwp_pollvote';
@@ -56,9 +71,11 @@ const DB = (() => {
       { id: 'cat_zycie', name: 'Życie codzienne', slug: 'zycie' },
       { id: 'cat_praca', name: 'Praca i szef', slug: 'praca' },
       { id: 'cat_rodzina', name: 'Rodzina', slug: 'rodzina' },
-      { id: 'cat_internet', name: 'Internet i memy', slug: 'internet' },
+      { id: 'cat_internet', name: 'Internet i technologia', slug: 'internet' },
       { id: 'cat_zagadki', name: 'Zagadki', slug: 'zagadki' },
-      { id: 'cat_klasyka', name: 'Klasyka', slug: 'klasyka' }
+      { id: 'cat_nostalgia', name: 'Nostalgia i PRL', slug: 'nostalgia' },
+      { id: 'cat_auto', name: 'Auta i drogi', slug: 'auto' },
+      { id: 'cat_zwierzeta', name: 'Zwierzaki', slug: 'zwierzeta' }
     ];
 
     const games = [
@@ -184,7 +201,8 @@ const DB = (() => {
       ads,
       answers: [],
       reports: [],
-      reactions: { fire: 0, wow: 0, heart: 0, poop: 0 }
+      reactions: { fire: 0, wow: 0, heart: 0, poop: 0 },
+      fb_removed: []
     };
   }
 
@@ -197,8 +215,59 @@ const DB = (() => {
       if (!Array.isArray(out[k])) out[k] = s[k];
     });
     out.reactions = Object.assign({}, s.reactions, d.reactions || {});
+    if (!Array.isArray(out.fb_removed)) out.fb_removed = [];
     out.version = 3;
     return out;
+  }
+
+  /* ---------------------- TREŚĆ Z FACEBOOKA ------------------------------ */
+  function fbContent() {
+    try { const f = window.__BWP_FB__; return (f && Array.isArray(f.posts)) ? f : null; }
+    catch (e) { return null; }
+  }
+  /* Wkłada posty z fb-content.js do stanu: grafiki/albumy/wpisy -> memy
+     (zatwierdzone, autor BekaWpigułce), rolki i filmy -> wideoteka.
+     Głosy, wyróżnienia i ukrycia z panelu są zachowywane; post usunięty
+     z Facebooka znika ze strony przy następnej synchronizacji. */
+  function applyFacebook(d) {
+    const fb = fbContent();
+    if (!fb) return d;
+    const removed = new Set(d.fb_removed || []);
+    (fb.categories || []).forEach(c => {
+      if (!d.categories.some(x => x.slug === c.slug)) d.categories.push({ id: 'cat_' + c.slug, name: c.name, slug: c.slug });
+    });
+    const live = new Set();
+    fb.posts.forEach((p, n) => {
+      const id = 'fb_' + p.id;
+      live.add(id);
+      if (removed.has(id)) return;
+      const imgs = Array.isArray(p.images) ? p.images : [];
+      if (p.kind === 'video') {
+        const v = {
+          id, source: 'facebook', title: p.title || 'Rolka BekaWpigułce', description: p.text || '',
+          thumb: imgs[0] || '', fb_url: p.url,
+          fb_embed: p.video_id ? 'https://www.facebook.com/' + (fb.page_id || 'Bekawpigulce') + '/videos/' + p.video_id + '/' : p.url,
+          length: p.length || null, reel: !!p.reel, category: p.category || 'zycie', created_at: p.created_at
+        };
+        const i = d.videos.findIndex(x => x.id === id);
+        if (i >= 0) d.videos[i] = Object.assign({}, d.videos[i], v); else d.videos.push(v);
+      } else {
+        const m = {
+          id, source: 'facebook', image: imgs[0] || placeholder(p.title || p.text || 'BEKA', n),
+          images: imgs, caption: p.text || p.title || '', author: 'BekaWpigułce',
+          category: p.category || 'zycie', tags: p.tags || [], created_at: p.created_at, source_fb: p.url
+        };
+        const i = d.memes.findIndex(x => x.id === id);
+        if (i >= 0) {
+          const old = d.memes[i];
+          d.memes[i] = Object.assign({}, old, m, { status: old.status === 'rejected' ? 'rejected' : 'approved' });
+        } else d.memes.push(Object.assign({ status: 'approved', votes_up: 0, votes_down: 0, featured: false }, m));
+      }
+    });
+    d.memes = d.memes.filter(m => m.source !== 'facebook' || live.has(m.id));
+    d.videos = d.videos.filter(v => v.source !== 'facebook' || live.has(v.id));
+    if (d.settings.mem_of_day_id && !d.memes.some(m => m.id === d.settings.mem_of_day_id)) d.settings.mem_of_day_id = null;
+    return d;
   }
 
   function externalContent() {
@@ -214,7 +283,7 @@ const DB = (() => {
     let base;
     if (ext && (!local || String(ext.published_at || '') > String(local.published_at || ''))) base = ext;
     else base = local || ext || seed();
-    base = withDefaults(base);
+    base = applyFacebook(withDefaults(base));
     try { localStorage.setItem(KEY, JSON.stringify(base)); } catch (e) {}
     return base;
   }
@@ -255,7 +324,10 @@ const DB = (() => {
     reject(id) { const m = memes.byId(id); if (m) { m.status = 'rejected'; save(); } return m; },
     toggleFeatured(id) { const m = memes.byId(id); if (m) { m.featured = !m.featured; save(); } return m; },
     setMemOfDay(id) { state.settings.mem_of_day_id = id; save(); },
-    remove(id) { state.memes = state.memes.filter(m => m.id !== id); state.comments = state.comments.filter(c => c.meme_id !== id); save(); },
+    remove(id) {
+      if (String(id).startsWith('fb_') && !state.fb_removed.includes(id)) state.fb_removed.push(id);
+      state.memes = state.memes.filter(m => m.id !== id); state.comments = state.comments.filter(c => c.meme_id !== id); save();
+    },
     vote(id, dir) {
       const voted = JSON.parse(localStorage.getItem(VOTES_KEY) || '{}');
       if (voted[id]) return { ok: false, reason: 'already' };
@@ -277,11 +349,14 @@ const DB = (() => {
   const videos = {
     all: () => state.videos.slice().sort((a, b) => b.created_at.localeCompare(a.created_at)),
     byCategory: (slug) => slug ? videos.all().filter(v => v.category === slug) : videos.all(),
-    add({ title, description, youtube, category = 'klasyka' }) {
+    add({ title, description, youtube, category = 'zycie' }) {
       const v = { id: uid('vid'), title, description, youtube: extractYouTube(youtube), category, created_at: now() };
       state.videos.unshift(v); save(); return v;
     },
-    remove(id) { state.videos = state.videos.filter(v => v.id !== id); save(); }
+    remove(id) {
+      if (String(id).startsWith('fb_') && !state.fb_removed.includes(id)) state.fb_removed.push(id);
+      state.videos = state.videos.filter(v => v.id !== id); save();
+    }
   };
 
   /* Katalog gier scalany W LOCIE ze stanem: dzięki temu nowe gry pojawiają
@@ -446,6 +521,7 @@ const DB = (() => {
 
   const raw = {
     reset() { localStorage.removeItem(KEY); state = load(); },
+    fb: () => fbContent(),
     export: () => JSON.stringify(state, null, 2),
     import(json) { try { state = withDefaults(JSON.parse(json)); save(); return true; } catch (e) { return false; } },
     /* Generuje zawartość pliku content.js do wgrania do repozytorium. */

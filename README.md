@@ -1,5 +1,10 @@
 # BekaWpigułce — strona z CMS-em 🔥
 
+> **Stan 25.11.2026:** strona zresetowana do zera (memy, konta, głosy, liczniki, rekordy gier)
+> i połączona z Facebookiem — posty z FB pojawiają się tu automatycznie co ~10 min.
+> Konfiguracja tokenu i pierwsze wypełnienie: **[FACEBOOK-SYNC.md](FACEBOOK-SYNC.md)**.
+> Logo i baner: `img/brand/`. Co się zmieniło: `CO-NOWEGO.txt`.
+
 Kompletna, wielostronicowa witryna humorystyczna z własnym panelem administracyjnym, systemem memów z głosowaniem i moderacją, mini-grami, quizem, sondami, wideoteką oraz miejscami na reklamy. Całość w **czystym HTML + CSS + JavaScript** — bez frameworków, bez kompilacji, bez kosztów. Działa od kliknięcia: lokalnie z dysku albo na dowolnym hostingu.
 
 Ciemny motyw w barwach marki: czerń `#0E0E0E`, żółć `#FFD400`, czerwień `#FF3B30`.

@@ -13,18 +13,29 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Archivo:ital,wght@0,600;0,800;0,900;1,900&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="icon" href="favicon.ico" sizes="any">
+<link rel="icon" type="image/png" href="img/brand/favicon-32.png">
+<link rel="apple-touch-icon" href="img/brand/apple-touch-icon.png">
+<meta name="theme-color" content="#0E0E0E">
+<meta property="og:site_name" content="BekaWpigułce">
+<meta property="og:title" content="BekaWpigułce — codzienna dawka humoru">
+<meta property="og:url" content="https://bekawpigulce.pl/">
+<meta property="og:type" content="website">
+<meta property="og:image" content="https://bekawpigulce.pl/img/brand/og-image.png">
 <link rel="stylesheet" href="style.css">
 </head>
 <body data-page="home">
 
-<!-- HERO -->
-<section class="hero">
-  <div class="dots"></div>
-  <span class="eyebrow">Polska · humor · codziennie</span>
-  <h1>Codzienna dawka <span class="pop">beki</span> <span class="hot">🔥</span></h1>
-  <p>Memy, mini-gry, quizy i wyzwania. Wrzucaj własne, głosuj na najlepsze i wbijaj na nasz ranking gorących memów.</p>
+<!-- HERO: baner marki -->
+<section class="hero hero--brand">
+  <h1 class="sr-only">BekaWpigułce — codzienna dawka humoru</h1>
+  <div class="hero-banner">
+    <img src="img/brand/banner.png" alt="BekaWpigułce — codzienna dawka humoru, @bekawpigulce" width="960" height="541" fetchpriority="high">
+  </div>
+  <p>Memy, rolki, zagadki i gry. Wszystko, co wrzucamy na Facebooka, ląduje tutaj automatycznie — głosuj, komentuj i graj.</p>
   <div class="hero-cta">
     <a href="memy.html" class="btn">Zobacz memy</a>
+    <a href="filmy.html" class="btn btn--ghost">Oglądaj rolki 🎬</a>
     <a href="rozrywka.html" class="btn btn--ghost">Zagraj w coś 🎮</a>
   </div>
   <div class="stats" id="heroStats"><!-- liczby z home.js --></div>
@@ -44,7 +55,7 @@
     <div class="grid grid-4">
       <a class="card center" href="memy.html" style="text-decoration:none;padding:22px 12px">
         <div style="font-size:2rem">😂</div><b style="margin:6px 0 2px">Memy</b>
-        <span class="muted micro">przeglądaj, głosuj, wrzucaj własne</span>
+        <span class="muted micro">grafiki z naszego FB + Wasze memy</span>
       </a>
       <a class="card center" href="rozrywka.html" style="text-decoration:none;padding:22px 12px">
         <div style="font-size:2rem">🎮</div><b style="margin:6px 0 2px">Gry i quizy</b>
@@ -56,7 +67,7 @@
       </a>
       <a class="card center" href="filmy.html" style="text-decoration:none;padding:22px 12px">
         <div style="font-size:2rem">🎬</div><b style="margin:6px 0 2px">Filmy</b>
-        <span class="muted micro">klasyki polskiego internetu</span>
+        <span class="muted micro">rolki i wideo prosto z Facebooka</span>
       </a>
     </div>
   </section>
@@ -157,6 +168,7 @@
 
 <!-- skrypty: najpierw dane, potem powłoka, na końcu logika strony -->
 <script src="content.js"></script>
+<script src="fb-content.js"></script>
 <script src="db.js"></script>
 <script src="shell.js"></script>
 <script src="cards.js"></script>

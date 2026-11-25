@@ -454,3 +454,31 @@ select.sel{background:var(--surface-2);border:1px solid var(--line-2);color:var(
 .ub-row button:active{background:var(--yellow);color:#111}
 #ubCv{max-width:100%}
 @media(max-width:520px){.ub-controls{grid-template-columns:1fr}}
+
+/* ===== MARKA (logo + baner) i treść z Facebooka — 25.11.2026 ===== */
+.brand{display:inline-flex;align-items:center;gap:9px}
+.brand-logo{width:38px;height:38px;border-radius:50%;flex:none;display:block}
+.brand--lg .brand-logo{width:48px;height:48px}
+.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+.hero--brand{padding-top:28px}
+.hero-banner{max-width:1000px;margin:0 auto}
+.hero-banner img{display:block;width:100%;height:auto;border-radius:22px;border:1px solid #262626;box-shadow:0 20px 60px rgba(0,0,0,.45)}
+.hero--brand p{margin-top:22px}
+.meme-more{position:absolute;bottom:10px;left:10px;background:rgba(0,0,0,.7)}
+.meme-cap--clamp{display:-webkit-box;-webkit-line-clamp:4;-webkit-box-orient:vertical;overflow:hidden;white-space:pre-line}
+.fb-src{color:var(--yellow);text-decoration:none;font-weight:600}
+.fb-src:hover{text-decoration:underline}
+.film-src{position:absolute;top:10px;left:10px;z-index:1}
+.film-len{position:absolute;bottom:8px;right:8px;z-index:1;background:rgba(0,0,0,.78);color:#fff;font-size:.75rem;font-weight:700;padding:2px 7px;border-radius:6px}
+.film--reel .film-thumb img{object-position:center 30%}
+.video-frame--reel{aspect-ratio:9/16;max-width:360px;max-height:75vh;margin:0 auto}
+@media (max-width:640px){
+  .hero--brand{padding:16px 12px 26px}
+  .hero-banner img{border-radius:14px}
+}
+@media (max-width:420px){
+  .nav-in{padding:10px 12px;gap:8px}
+  .brand{font-size:1rem;gap:6px}
+  .brand-logo{width:32px;height:32px}
+  .nav-right{gap:6px}
+}

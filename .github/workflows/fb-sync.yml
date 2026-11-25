@@ -1,0 +1,55 @@
+# Automatyczne przenoszenie postów z Facebooka (BekaWpigułce) na bekawpigulce.pl.
+# Co ~10 minut pobiera nowe posty przez Graph API, zapisuje grafiki do img/fb/,
+# aktualizuje fb-content.js, commituje i odświeża GitHub Pages.
+# Wymaga sekretu repozytorium FB_PAGE_TOKEN (token strony, patrz FACEBOOK-SYNC.md).
+name: Synchronizacja z Facebookiem
+
+on:
+  schedule:
+    - cron: "*/10 * * * *"
+  workflow_dispatch:
+    inputs:
+      full:
+        description: "Pobierz CAŁĄ historię strony (pierwsze wypełnienie)"
+        type: boolean
+        default: false
+
+permissions:
+  contents: write
+  pages: write
+
+concurrency:
+  group: fb-sync
+  cancel-in-progress: false
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Pillow (zmniejszanie grafik)
+        run: pip install --quiet pillow
+
+      - name: Pobierz posty z Facebooka
+        env:
+          FB_PAGE_TOKEN: ${{ secrets.FB_PAGE_TOKEN }}
+          FB_PAGE_ID: ${{ vars.FB_PAGE_ID }}
+        run: python tools/fb_sync.py ${{ inputs.full && '--full' || '' }}
+
+      - name: Zapisz zmiany i odśwież stronę
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          git config user.name "BekaWpigulce bot"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A fb-content.js img/fb
+          if git diff --cached --quiet; then echo "Brak nowych postów."; exit 0; fi
+          git commit -m "Facebook: synchronizacja $(date -u '+%Y-%m-%d %H:%M') UTC"
+          git push
+          gh api -X POST "repos/${{ github.repository }}/pages/builds" >/dev/null || echo "Pages przebuduje się samo."

@@ -144,6 +144,12 @@
         <div class="grid grid-3" style="margin-bottom:8px">
           <div class="stat-tile green"><b id="visitTotal">…</b><span>Wejścia na stronę (łącznie)</span></div>
           <div class="stat-tile"><b id="visitUnique">…</b><span>Unikalni odwiedzający</span></div>
+          ${(() => {
+            const fb = DB.raw.fb();
+            const n = fb ? fb.posts.length : 0;
+            const when = fb && fb.synced_at ? new Date(fb.synced_at).toLocaleString('pl-PL') : 'jeszcze nie było';
+            return `<div class="stat-tile ${n ? 'green' : 'red'}"><b>${n}</b><span>Postów z Facebooka · ostatnia synchronizacja: ${esc(when)}</span></div>`;
+          })()}
         </div>
         <div class="adm-card">
           <div class="adm-section-title">🔥 Top 5 memów (wg głosów)</div>
@@ -158,7 +164,7 @@
          /get nie podbija licznika — tylko odczytuje. 404 = nikt jeszcze nie wszedł. */
       (function loadVisitStats() {
         const API = 'https://abacus.jasoncameron.dev', NS = 'bekawpigulce.pl';
-        [['wejscia', 'visitTotal'], ['unikalni', 'visitUnique']].forEach(([key, id]) => {
+        [[UI.VISIT_KEYS[0], 'visitTotal'], [UI.VISIT_KEYS[1], 'visitUnique']].forEach(([key, id]) => {
           fetch(API + '/get/' + NS + '/' + key)
             .then(r => r.ok ? r.json() : { value: 0 })
             .then(j => { const n = el(id); if (n) n.textContent = Number(j.value || 0).toLocaleString('pl-PL'); })
@@ -212,7 +218,7 @@
           <button class="btn btn--ghost btn--sm" data-act="repclear" title="${reps.map(r => DB.util.esc(r.reason)).join(', ')}">wyczyść</button></div>` : '';
         return `<tr data-id="${m.id}" ${reps.length ? 'style="background:#241416"' : ''}>
           <td><img class="thumb" src="${m.image}" alt=""${m.fallback ? ` onerror="this.onerror=null;this.src='${m.fallback}'"` : ''}></td>
-          <td>${esc(m.caption || '—')}<div class="micro muted">${esc(m.author)}</div>${repBadge}</td>
+          <td>${esc((m.caption || '—').slice(0, 140))}<div class="micro muted">${esc(m.author)}${m.source === 'facebook' ? ' · z Facebooka (usunięcie = ukrycie na stronie)' : ''}</div>${repBadge}</td>
           <td>${st}</td>
           <td><b style="color:var(--yellow)">${DB.memes.score(m)}</b><div class="micro muted">+${m.votes_up}/-${m.votes_down}</div></td>
           <td>
@@ -340,7 +346,7 @@
           <table class="atable">
             <thead><tr><th></th><th>Tytuł</th><th>Kategoria</th><th></th></tr></thead>
             <tbody>${vids.map(v => `<tr data-id="${v.id}">
-              <td><img class="thumb" src="https://img.youtube.com/vi/${v.youtube}/default.jpg" onerror="this.src='${DB.util.placeholder(v.title,3)}'" alt=""></td>
+              <td><img class="thumb" src="${v.thumb ? esc(v.thumb) : 'https://img.youtube.com/vi/' + v.youtube + '/default.jpg'}" onerror="this.src='${DB.util.placeholder(v.title,3)}'" alt=""></td>
               <td>${esc(v.title)}</td><td class="muted micro">${esc(DB.categories.name(v.category))}</td>
               <td><button class="btn btn--red btn--sm" data-del>Usuń</button></td></tr>`).join('') || '<tr><td colspan="4" class="muted">Brak filmów.</td></tr>'}</tbody>
           </table>

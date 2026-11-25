@@ -169,7 +169,7 @@ const UI = (() => {
       ${banner}
       <header class="nav">
         <div class="nav-in wrap">
-          <a class="brand" href="index.html">Beka<b>Wpigułce</b><i>🔥</i></a>
+          <a class="brand" href="index.html"><img class="brand-logo" src="img/brand/logo-96.png" alt="" width="38" height="38"><span>Beka<b>Wpigułce</b></span></a>
           <nav class="nav-links" id="navLinks">${links}</nav>
           <div class="nav-right">
             <a href="panel-admina.html" class="nav-admin ${active === 'admin' ? 'is-active' : ''}" title="Panel admina">
@@ -189,7 +189,7 @@ const UI = (() => {
       <footer class="foot">
         <div class="wrap foot-in">
           <div>
-            <div class="brand brand--lg">Beka<b>Wpigułce</b></div>
+            <div class="brand brand--lg"><img class="brand-logo" src="img/brand/logo-96.png" alt="" width="48" height="48"><span>Beka<b>Wpigułce</b></span></div>
             <p class="muted">${UI_escape(s.tagline)}</p>
           </div>
           <nav class="foot-links">
@@ -230,15 +230,18 @@ const UI = (() => {
      'unikalni' — bije tylko przy pierwszej wizycie z danego urządzenia
                   (flaga w localStorage; strona statyczna nie widzi IP).
      Panel admina nie jest liczony, żeby nie zawyżać własnych statystyk. */
+  /* Liczniki wyzerowane 25.11.2026 = nowe klucze (stare zostają w Abacus nieużywane). */
+  const VISIT_KEYS = ['wejscia-reset-20261125', 'unikalni-reset-20261125'];
   function trackVisit() {
     if (document.body.dataset.page === 'admin') return;
-    if (location.protocol === 'file:' || location.hostname === 'localhost') return;
+    if (location.protocol === 'file:' || ['localhost', '127.0.0.1', '[::1]'].includes(location.hostname)) return;
     const API = 'https://abacus.jasoncameron.dev';
     const NS = 'bekawpigulce.pl';
-    fetch(API + '/hit/' + NS + '/wejscia').catch(() => {});
+    const [K_ALL, K_UNIQ] = VISIT_KEYS;
+    fetch(API + '/hit/' + NS + '/' + K_ALL).catch(() => {});
     try {
       if (!localStorage.getItem('bkw_uv')) {
-        fetch(API + '/hit/' + NS + '/unikalni')
+        fetch(API + '/hit/' + NS + '/' + K_UNIQ)
           .then(r => { if (r.ok) localStorage.setItem('bkw_uv', '1'); })
           .catch(() => {});
       }
@@ -264,5 +267,5 @@ const UI = (() => {
   /* auto-montaż po załadowaniu DOM */
   document.addEventListener('DOMContentLoaded', () => { mountChrome(); });
 
-  return { toast, modal, closeModal, requireUser, loadFacebook, fbLogin, renderAds, NAV };
+  return { toast, modal, closeModal, requireUser, loadFacebook, fbLogin, renderAds, NAV, VISIT_KEYS };
 })();

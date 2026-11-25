@@ -37,16 +37,18 @@ const Cards = (() => {
     const rankClass = opts.rank ? ` r${opts.rank}` : '';
     const rankBadge = opts.rank ? `<div class="meme-rank${rankClass}">${opts.rank}</div>` : '';
     const tags = (m.tags || []).slice(0, 3).map(t => `<span class="tag">${e(t)}</span>`).join(' ');
+    const more = (m.images || []).length > 1 ? `<span class="pill meme-more">+${m.images.length - 1} 📷</span>` : '';
+    const fbLink = m.source_fb ? ` · <a href="${e(m.source_fb)}" target="_blank" rel="noopener" class="fb-src">na Facebooku ↗</a>` : '';
 
     el.innerHTML = `
       <div class="meme-imgwrap">
         ${rankBadge}
-        <span class="pill pill--y meme-cat">${e(DB.categories.name(m.category))}</span>
+        <span class="pill pill--y meme-cat">${e(DB.categories.name(m.category))}</span>${more}
         <img src="${m.image}" alt="${e(m.caption)}" loading="lazy"${m.fallback ? ` onerror="this.onerror=null;this.src='${m.fallback}'"` : ''}>
       </div>
       <div class="meme-body">
-        <p class="meme-cap">${e(m.caption)}</p>
-        <div class="meme-meta">${m.author ? '@' + e(m.author) : 'anonim'} · ${timeAgo(m.created_at)}</div>
+        <p class="meme-cap${m.source === 'facebook' ? ' meme-cap--clamp' : ''}">${e(m.caption)}</p>
+        <div class="meme-meta">${m.author ? '@' + e(m.author) : 'anonim'} · ${timeAgo(m.created_at)}${fbLink}</div>
         <div class="heat" title="${heatPct}% reakcji na 🔥"><i style="width:${heatPct}%"></i></div>
         ${tags ? `<div class="meme-tags">${tags}</div>` : ''}
         <div class="meme-foot">
@@ -77,6 +79,12 @@ const Cards = (() => {
     });
 
     el.querySelector('.cmt-open').onclick = () => openComments(m.id);
+    if ((m.images || []).length > 1) {
+      const img = el.querySelector('.meme-imgwrap img');
+      img.style.cursor = 'zoom-in';
+      img.onclick = () => UI.modal(m.images.map(src => `<img src="${e(src)}" alt="" loading="lazy" style="width:100%;border-radius:12px;margin-bottom:10px">`).join('')
+        + `<p class="muted">${e(m.caption)}</p>`, { title: '📷 Album', wide: true });
+    }
     el.querySelector('.share').onclick = () => share(m);
 
     // ulubione (lokalnie, per przeglądarka)
@@ -159,13 +167,18 @@ const Cards = (() => {
   }
 
   /* ----- KARTA FILMU ---------------------------------------------------- */
+  const fmtLen = (s) => s ? Math.floor(s / 60) + ':' + String(Math.round(s % 60)).padStart(2, '0') : '';
   function video(v) {
     const el = document.createElement('article');
-    el.className = 'film';
+    el.className = 'film' + (v.reel ? ' film--reel' : '');
+    const thumb = v.thumb || `https://img.youtube.com/vi/${v.youtube}/hqdefault.jpg`;
+    const badge = v.source === 'facebook' ? `<span class="pill pill--y film-src">${v.reel ? 'Rolka' : 'Wideo'} z FB</span>` : '';
+    const len = fmtLen(v.length);
     el.innerHTML = `
       <div class="film-thumb">
-        <img src="https://img.youtube.com/vi/${v.youtube}/hqdefault.jpg" alt="${e(v.title)}" loading="lazy"
+        <img src="${e(thumb)}" alt="${e(v.title)}" loading="lazy"
              onerror="this.src='${DB.util.placeholder(v.title, 3)}'">
+        ${badge}${len ? `<span class="film-len">${len}</span>` : ''}
         <div class="film-play"><span>▶</span></div>
       </div>
       <div class="film-body">
@@ -177,6 +190,20 @@ const Cards = (() => {
     return el;
   }
   function playVideo(v) {
+    if (v.source === 'facebook') {
+      const src = 'https://www.facebook.com/plugins/video.php?href=' + encodeURIComponent(v.fb_embed || v.fb_url)
+        + '&show_text=false&autoplay=true&width=' + (v.reel ? 360 : 640);
+      UI.modal(`
+        <div class="video-frame${v.reel ? ' video-frame--reel' : ''}">
+          <iframe src="${e(src)}" title="${e(v.title)}" scrolling="no" allowfullscreen
+            allow="autoplay;clipboard-write;encrypted-media;picture-in-picture;web-share"></iframe>
+        </div>
+        <h3 class="card-h" style="margin-top:14px">${e(v.title)}</h3>
+        <p class="muted" style="white-space:pre-line">${e(v.description || '')}</p>
+        <a class="btn btn--fb btn--sm" style="margin-top:10px" href="${e(v.fb_url)}" target="_blank" rel="noopener">Obejrzyj na Facebooku ↗</a>`,
+        { title: '', wide: !v.reel });
+      return;
+    }
     UI.modal(`
       <div class="video-frame">
         <iframe src="https://www.youtube.com/embed/${v.youtube}?autoplay=1&rel=0" title="${e(v.title)}"

@@ -12,9 +12,9 @@
   /* --- Hero: liczby --- */
   const st = DB.stats();
   $('#heroStats').innerHTML = [
-    [st.memes_approved, 'memów'],
+    [st.memes_approved, 'grafik i memów'],
     [st.votes_total.toLocaleString('pl-PL'), 'głosów'],
-    [st.answers_pub, 'odpowiedzi'],
+    [st.videos, 'rolek i filmów'],
     ['10K+', 'fanów na FB']
   ].map(x => `<div class="stat"><b>${x[0]}</b><span>${x[1]}</span></div>`).join('');
 

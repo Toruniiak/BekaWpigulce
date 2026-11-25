@@ -31,17 +31,32 @@
       </div></a>`;
   }
 
+  /* Zagadki opublikowane na Facebooku (kategoria „Zagadki", z fb-content.js). */
+  function fbRiddleCard(m) {
+    return `<a class="ans-card" href="${e(m.source_fb)}" target="_blank" rel="noopener">
+      <div class="ans-thumb"><img src="${e(m.image)}" alt="" loading="lazy"></div>
+      <div class="ans-card-body">
+        <span class="eyebrow">Zagadka z FB · ${new Date(m.created_at).toLocaleDateString('pl-PL')}</span>
+        <h3>${e((m.caption || 'Zagadka').split(String.fromCharCode(10))[0].slice(0, 90))}</h3>
+        <span class="ans-go">Odpowiedz w komentarzu na FB ↗</span>
+      </div></a>`;
+  }
+
   function renderList() {
     const list = DB.answers.published();
+    const fbRiddles = DB.memes.approved().filter(m => m.source === 'facebook' && m.category === 'zagadki')
+      .sort((a, b) => b.created_at.localeCompare(a.created_at)).slice(0, 24);
     root.innerHTML = `
       <span class="eyebrow">Strefa odpowiedzi</span>
       <h1 style="font-family:var(--disp);font-weight:900;font-size:clamp(2rem,6vw,3.2rem);letter-spacing:-.02em">
         Odpowiedzi <span style="color:var(--yellow)">do zagadek</span> ✅</h1>
       <p class="muted" style="max-width:60ch;margin-top:8px">Rozwiązania i wyjaśnienia do zagadek, quizów i iluzji z naszego Facebooka. Kliknij, sprawdź, czy miałeś rację — i wpadnij po więcej.</p>
       ${adBox('top')}
+      ${fbRiddles.length ? `<h2 class="sec-h" style="margin:8px 0 14px">Najnowsze <span class="ac">zagadki z Facebooka</span></h2>
+        <section class="ans-grid" style="margin-bottom:26px">${fbRiddles.map(fbRiddleCard).join('')}</section>` : ''}
       ${list.length
-        ? `<section class="ans-grid">${list.map(card).join('')}</section>`
-        : `<div class="card center" style="padding:48px"><div style="font-size:2.6rem">🧩</div>
+        ? `<h2 class="sec-h" style="margin:8px 0 14px">Odpowiedzi z <span class="ac">wyjaśnieniem</span></h2><section class="ans-grid">${list.map(card).join('')}</section>`
+        : fbRiddles.length ? '' : `<div class="card center" style="padding:48px"><div style="font-size:2.6rem">🧩</div>
             <p style="font-weight:600;margin-top:8px">Nie ma jeszcze żadnej odpowiedzi.</p>
             <p class="muted">Dodasz je w panelu admina (zakładka „Odpowiedzi").</p></div>`}
       ${adBox('in-feed')}
